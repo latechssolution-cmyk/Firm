@@ -1,12 +1,15 @@
 import Link from "next/link";
 import { getDB } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
-import { recordPayment, sendFeeReminder } from "@/lib/actions";
-import { PageTitle, Card, Button, rupees } from "@/components/ui";
+import { recordPayment, sendFeeReminder, remindAllOverdue } from "@/lib/actions";
+import { PageTitle, Card, Button, Stat, rupees } from "@/components/ui";
+import { feeAnalytics } from "@/lib/insights";
+import { IconFees } from "@/components/icons";
 
 export default async function FeesPage() {
   await requireUser(["admin", "associate"]);
   const db = await getDB();
+  const fa = feeAnalytics(db);
 
   const perCase = db.cases
     .map((c) => {
@@ -18,13 +21,22 @@ export default async function FeesPage() {
     .filter((r) => r.agreed > 0)
     .sort((a, b) => b.balance - a.balance);
 
-  const totalPending = perCase.reduce((s, r) => s + r.balance, 0);
-
   return (
     <div>
-      <PageTitle right={<span className="text-sm font-bold" style={{ color: "var(--color-warning)" }}>Pending {rupees(totalPending)}</span>}>
+      <PageTitle right={
+        <form action={remindAllOverdue}>
+          <Button kind="secondary">Remind all overdue ({fa.casesWithBalance})</Button>
+        </form>
+      }>
         Fees &amp; Billing
       </PageTitle>
+
+      <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Stat label="Agreed" value={rupees(fa.agreed)} icon={<IconFees size={18} />} />
+        <Stat label="Received" value={rupees(fa.received)} tone="success" />
+        <Stat label="Pending" value={rupees(fa.pending)} tone="warning" sub={`${fa.casesWithBalance} cases`} />
+        <Stat label="Collection rate" value={`${fa.collectionRate}%`} tone={fa.collectionRate >= 70 ? "success" : "warning"} />
+      </div>
 
       <Card className="overflow-x-auto !p-0">
         <table>

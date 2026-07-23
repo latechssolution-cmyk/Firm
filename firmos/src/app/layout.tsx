@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import "./globals.css";
 import { ThemeProvider, THEME_INIT_SCRIPT } from "@/lib/theme/ThemeProvider";
+import { Toaster } from "@/components/Toaster";
 
 export const metadata: Metadata = {
   title: "FirmOS — Legal Practice Management",
@@ -16,6 +18,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       </head>
       <body>
         <ThemeProvider>{children}</ThemeProvider>
+        <Suspense><Toaster /></Suspense>
       </body>
     </html>
   );

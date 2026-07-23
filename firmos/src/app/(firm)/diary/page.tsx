@@ -1,11 +1,14 @@
 import Link from "next/link";
 import { getDB } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
-import { PageTitle, Card, Badge, toneForReadiness, Empty } from "@/components/ui";
+import { notifyTomorrowHearings } from "@/lib/actions";
+import { PageTitle, Card, Badge, Button, toneForReadiness, Empty } from "@/components/ui";
 
 export default async function DiaryPage() {
   await requireUser(["admin", "associate", "clerk"]);
   const db = await getDB();
+  const tomorrowStr = (() => { const d = new Date(); d.setDate(d.getDate() + 1); return d.toISOString().slice(0, 10); })();
+  const tomorrowCount = db.hearings.filter((h) => h.date === tomorrowStr && !h.outcomeNote).length;
   const today = new Date().toISOString().slice(0, 10);
   const horizon = (() => { const d = new Date(); d.setDate(d.getDate() + 30); return d.toISOString().slice(0, 10); })();
 
@@ -23,7 +26,15 @@ export default async function DiaryPage() {
 
   return (
     <div>
-      <PageTitle>Court Diary <span className="text-sm font-normal" style={{ color: "var(--color-text-secondary)" }}>(next 30 days)</span></PageTitle>
+      <PageTitle right={
+        tomorrowCount > 0 ? (
+          <form action={notifyTomorrowHearings}>
+            <Button kind="primary">Notify tomorrow&apos;s clients ({tomorrowCount})</Button>
+          </form>
+        ) : undefined
+      }>
+        Court Diary <span className="text-sm font-normal" style={{ color: "var(--color-text-secondary)" }}>(next 30 days)</span>
+      </PageTitle>
       {byDate.size === 0 && <Card><Empty>No upcoming hearings.</Empty></Card>}
       <div className="flex flex-col gap-4">
         {Array.from(byDate.entries()).map(([date, hs]) => (

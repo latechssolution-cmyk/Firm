@@ -43,6 +43,10 @@ export async function recordHearing(formData: FormData) {
       enteredBy: user.id, enteredAt: new Date().toISOString(),
     });
   }
+  // Optional stage advancement (smart auto-advance).
+  const newStage = String(formData.get("newStage") ?? "").trim();
+  if (newStage && newStage !== kase.stage) kase.stage = newStage;
+
   const client = db.clients.find((cl) => cl.id === kase.clientId);
   const court = db.courts.find((ct) => ct.id === kase.courtId);
   if (client) {
@@ -53,7 +57,7 @@ export async function recordHearing(formData: FormData) {
       payload: `${kase.title}: ${outcome}${nextDate ? ` — next date ${nextDate} at ${court?.name ?? ""}` : ""}`,
     });
   }
-  await audit({ userId: user.id, userName: user.name, action: "edit", entityType: "case", entityId: kase.number, detail: `Hearing recorded: ${outcome.slice(0, 60)}` });
+  await audit({ userId: user.id, userName: user.name, action: "edit", entityType: "case", entityId: kase.number, detail: `Hearing recorded: ${outcome.slice(0, 60)}${newStage ? ` · stage → ${newStage}` : ""}` });
   await persist();
   revalidatePath(`/cases/${caseId}`);
   revalidatePath("/dashboard");
@@ -84,7 +88,7 @@ export async function createCase(formData: FormData) {
   await audit({ userId: user.id, userName: user.name, action: "create", entityType: "case", entityId: String(formData.get("number")) });
   await persist();
   revalidatePath("/cases");
-  redirect(`/cases/${id}`);
+  redirect(`/cases/${id}?toast=${encodeURIComponent("Case created")}`);
 }
 
 export async function generateDocument(formData: FormData) {
@@ -166,6 +170,78 @@ export async function setInquiryStatus(formData: FormData) {
   await audit({ userId: user.id, userName: user.name, action: "edit", entityType: "inquiry", entityId: q.callerName, detail: `status=${q.status}` });
   await persist();
   revalidatePath("/inquiries");
+}
+
+/** Automation: queue a reminder to every client with a hearing tomorrow (day-before digest). */
+export async function notifyTomorrowHearings() {
+  const user = await requireUser(["admin", "associate", "clerk"]);
+  const db = await getDB();
+  const tomorrow = (() => { const d = new Date(); d.setDate(d.getDate() + 1); return d.toISOString().slice(0, 10); })();
+  const hearings = db.hearings.filter((h) => h.date === tomorrow && !h.outcomeNote);
+  let sent = 0;
+  for (const h of hearings) {
+    const kase = db.cases.find((c) => c.id === h.caseId);
+    const client = kase && db.clients.find((cl) => cl.id === kase.clientId);
+    const court = kase && db.courts.find((ct) => ct.id === kase.courtId);
+    if (!kase || !client) continue;
+    await enqueueNotification({
+      recipient: `${client.name} (${client.phone})`,
+      channel: client.languagePref === "ur" ? "whatsapp" : "sms",
+      template: "hearing-reminder",
+      payload: `Reminder: your hearing in ${kase.title} is tomorrow${h.time ? ` at ${h.time}` : ""}, ${court?.name ?? ""}${court?.room ? ` (${court.room})` : ""}.`,
+    });
+    sent++;
+  }
+  await audit({ userId: user.id, userName: user.name, action: "create", entityType: "automation", entityId: "day-before-digest", detail: `${sent} hearing reminders queued` });
+  revalidatePath("/diary");
+  revalidatePath("/settings");
+  redirect(`/diary?toast=${encodeURIComponent(`${sent} hearing reminder${sent === 1 ? "" : "s"} queued to clients`)}`);
+}
+
+/** Automation: queue a polite reminder to every client with an outstanding balance. */
+export async function remindAllOverdue() {
+  const user = await requireUser(["admin", "associate"]);
+  const db = await getDB();
+  let sent = 0;
+  for (const kase of db.cases.filter((c) => c.status === "active")) {
+    const fees = db.fees.filter((f) => f.caseId === kase.id);
+    const bal = fees.filter((f) => f.kind === "agreed").reduce((s, f) => s + f.amount, 0) - fees.filter((f) => f.kind === "received").reduce((s, f) => s + f.amount, 0);
+    if (bal <= 0) continue;
+    const client = db.clients.find((cl) => cl.id === kase.clientId);
+    if (!client) continue;
+    await enqueueNotification({
+      recipient: `${client.name} (${client.phone})`,
+      channel: "whatsapp",
+      template: "fee-reminder",
+      payload: `Gentle reminder: a balance of Rs ${bal.toLocaleString("en-PK")} is pending in ${kase.title}. Kindly arrange payment at your convenience.`,
+    });
+    sent++;
+  }
+  await audit({ userId: user.id, userName: user.name, action: "create", entityType: "automation", entityId: "bulk-fee-reminders", detail: `${sent} fee reminders queued` });
+  revalidatePath("/fees");
+  revalidatePath("/settings");
+  redirect(`/fees?toast=${encodeURIComponent(`${sent} fee reminder${sent === 1 ? "" : "s"} queued`)}`);
+}
+
+/** Automation: convert an inquiry into a client (one click). */
+export async function convertInquiry(formData: FormData) {
+  const user = await requireUser(["admin", "associate", "clerk"]);
+  const db = await getDB();
+  const q = db.inquiries.find((i) => i.id === String(formData.get("inquiryId")));
+  if (!q) return;
+  const existing = db.clients.find((c) => c.phone === q.phone);
+  if (!existing) {
+    db.clients.push({
+      id: uid("cl"), name: q.callerName, phone: q.phone,
+      languagePref: /[؀-ۿ]/.test(q.summary) ? "ur" : "en",
+    });
+  }
+  q.status = "converted";
+  await audit({ userId: user.id, userName: user.name, action: "create", entityType: "client", entityId: q.callerName, detail: "Converted from inquiry" });
+  await persist();
+  revalidatePath("/inquiries");
+  revalidatePath("/clients");
+  redirect(`/clients?toast=${encodeURIComponent(`${q.callerName} added as a client`)}`);
 }
 
 export async function resetDemoData() {

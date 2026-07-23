@@ -47,6 +47,8 @@ export interface Case {
   policeStation?: string;
   sections?: string[];
   filedOn: string; // ISO date
+  decidedOn?: string; // ISO date, when judgment/decree passed
+  limitationDate?: string; // manual limitation/deadline override
   linkedCaseId?: string; // matter thread predecessor
 }
 

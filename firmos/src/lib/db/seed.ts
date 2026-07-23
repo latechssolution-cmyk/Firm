@@ -52,7 +52,7 @@ export function buildSeed(): DB {
       id: "k-sana", matterThreadId: "t-sana", number: "C.S. No. 337/2026", type: "civil",
       courtId: "c-civ", stage: "Evidence (plaintiff)", title: "Sana Traders v. Metro Corporation",
       parties: { plaintiff: "Sana Traders", defendant: "Metro Corporation" }, clientId: "cl-sana",
-      assignedUserIds: ["u-admin"], status: "active", filedOn: addDays(-140),
+      assignedUserIds: ["u-admin"], status: "active", filedOn: addDays(-140), limitationDate: addDays(9),
     },
     {
       id: "k-khan", matterThreadId: "t-khan", number: "Family Suit No. 88/2026", type: "family",
@@ -70,7 +70,7 @@ export function buildSeed(): DB {
       id: "k-city-trial", matterThreadId: "t-city", number: "C.S. No. 902/2025", type: "civil",
       courtId: "c-civ", stage: "Decreed", title: "City Builders v. Naveed & Sons (trial)",
       parties: { plaintiff: "City Builders", defendant: "Naveed & Sons" }, clientId: "cl-city",
-      assignedUserIds: ["u-admin"], status: "decided", filedOn: "2025-03-12",
+      assignedUserIds: ["u-admin"], status: "decided", filedOn: "2025-03-12", decidedOn: addDays(-120),
     },
     {
       id: "k-wp", matterThreadId: "t-wp", number: "W.P. No. 4412/2026", type: "writ",

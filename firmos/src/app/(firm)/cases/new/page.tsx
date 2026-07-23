@@ -2,6 +2,7 @@ import { getDB } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { createCase } from "@/lib/actions";
 import { Card, PageTitle, Button } from "@/components/ui";
+import { ConflictCheck } from "@/components/ConflictCheck";
 
 export default async function NewCasePage() {
   await requireUser(["admin", "associate", "clerk"]);
@@ -53,6 +54,7 @@ export default async function NewCasePage() {
           <label className="text-sm md:col-span-2">Sections (comma-separated)
             <input name="sections" placeholder="e.g. 302/34 PPC" className="mt-1" />
           </label>
+          <ConflictCheck />
           <div className="md:col-span-2"><Button kind="primary">Create case</Button></div>
         </form>
       </Card>

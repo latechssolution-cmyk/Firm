@@ -14,10 +14,13 @@ export function Card({ children, elevated = false, className = "" }: { children:
   );
 }
 
-export function Stat({ label, value, sub, tone }: { label: string; value: string; sub?: string; tone?: "success" | "warning" | "danger" | "info" }) {
+export function Stat({ label, value, sub, tone, icon }: { label: string; value: string; sub?: string; tone?: "success" | "warning" | "danger" | "info"; icon?: ReactNode }) {
   return (
     <Card>
-      <div className="text-2xl font-bold" style={{ color: tone ? `var(--color-${tone})` : "var(--color-text-primary)" }}>{value}</div>
+      <div className="flex items-start justify-between gap-2">
+        <div className="text-2xl font-bold" style={{ color: tone ? `var(--color-${tone})` : "var(--color-text-primary)" }}>{value}</div>
+        {icon && <span style={{ color: "var(--color-text-secondary)" }}>{icon}</span>}
+      </div>
       <div className="mt-1 text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--color-text-secondary)" }}>{label}</div>
       {sub && <div className="mt-1 text-xs" style={{ color: "var(--color-text-secondary)" }}>{sub}</div>}
     </Card>

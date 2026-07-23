@@ -1,6 +1,6 @@
 import { getDB } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
-import { setInquiryStatus } from "@/lib/actions";
+import { setInquiryStatus, convertInquiry } from "@/lib/actions";
 import { PageTitle, Card, Badge, Button, Empty } from "@/components/ui";
 
 export default async function InquiriesPage() {
@@ -47,6 +47,12 @@ export default async function InquiriesPage() {
               </select>
               <Button kind="secondary">Update</Button>
             </form>
+            {q.status !== "converted" && (
+              <form action={convertInquiry} className="mt-2">
+                <input type="hidden" name="inquiryId" value={q.id} />
+                <Button kind="primary">✓ Convert to client</Button>
+              </form>
+            )}
           </Card>
         ))}
       </div>
