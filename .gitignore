@@ -9,3 +9,6 @@ next-env.d.ts
 firmos/worker/.env
 firmos/worker/vm-ip.txt
 *.pem
+
+.vercel
+.env*.local

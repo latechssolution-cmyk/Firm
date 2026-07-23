@@ -37,3 +37,6 @@ next-env.d.ts
 
 # local demo tenant store
 .data/
+
+.vercel
+.env*.local
