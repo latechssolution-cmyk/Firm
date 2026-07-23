@@ -5,3 +5,7 @@ node_modules/
 .env.local
 *.tsbuildinfo
 next-env.d.ts
+# OCI worker secrets & keys
+firmos/worker/.env
+firmos/worker/vm-ip.txt
+*.pem
