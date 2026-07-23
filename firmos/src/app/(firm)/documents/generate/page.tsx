@@ -4,9 +4,9 @@ import { generateDocument } from "@/lib/actions";
 import { Card, PageTitle, Button } from "@/components/ui";
 import { TEMPLATES } from "@/lib/templates";
 
-export default function GeneratePage({ searchParams }: { searchParams: { template?: string; caseId?: string } }) {
-  requireUser(["admin", "associate", "clerk"]);
-  const db = getDB();
+export default async function GeneratePage({ searchParams }: { searchParams: { template?: string; caseId?: string } }) {
+  await requireUser(["admin", "associate", "clerk"]);
+  const db = await getDB();
   const template = TEMPLATES.find((t) => t.id === searchParams.template) ?? TEMPLATES[0];
   const kase = db.cases.find((c) => c.id === searchParams.caseId) ?? db.cases[0];
   const client = db.clients.find((cl) => cl.id === kase.clientId);

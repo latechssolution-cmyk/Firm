@@ -5,14 +5,15 @@ import type { Role, User } from "./db/types";
 
 const COOKIE = "firmos-session";
 
-export function currentUser(): User | null {
+export async function currentUser(): Promise<User | null> {
   const c = cookies().get(COOKIE)?.value;
   if (!c) return null;
-  return getDB().users.find((u) => u.id === c) ?? null;
+  const db = await getDB();
+  return db.users.find((u) => u.id === c) ?? null;
 }
 
-export function requireUser(roles?: Role[]): User {
-  const u = currentUser();
+export async function requireUser(roles?: Role[]): Promise<User> {
+  const u = await currentUser();
   if (!u) redirect("/login");
   if (roles && !roles.includes(u.role)) redirect(u.role === "client" ? "/portal" : "/dashboard");
   return u;

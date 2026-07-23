@@ -30,7 +30,7 @@ function nextSlot(): string {
 
 export async function POST(req: NextRequest) {
   const { messages, state } = (await req.json()) as { messages: Msg[]; state: State | null };
-  const db = getDB();
+  const db = await getDB();
   const s: State = state ?? { step: "name" };
   const last = messages.filter((m) => m.from === "caller").pop()?.text?.trim() ?? "";
   const urgent = messages.some((m) => m.from === "caller" && URGENT_WORDS.some((w) => m.text.toLowerCase().includes(w)));
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
         transcript: [...messages, { from: "assistant", text: "(callback confirmed)" }],
         createdAt: new Date().toISOString(),
       });
-      enqueueNotification({
+      await enqueueNotification({
         recipient: "Adv. Ahmed Raza (advocate WhatsApp)",
         channel: "whatsapp", template: urgent ? "urgent-inquiry" : "new-inquiry",
         payload: `${urgent ? "⚑ URGENT — " : ""}New inquiry: ${s.matter} — ${s.summary?.slice(0, 80)} · Callback ${slot} · ${s.name} ${s.phone}`,

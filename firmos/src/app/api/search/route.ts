@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDB } from "@/lib/db";
 import { currentUser } from "@/lib/auth";
 
-export function GET(req: NextRequest) {
-  const user = currentUser();
+export async function GET(req: NextRequest) {
+  const user = await currentUser();
   if (!user || user.role === "client") return NextResponse.json([], { status: 401 });
   const q = (req.nextUrl.searchParams.get("q") ?? "").toLowerCase().trim();
   if (!q) return NextResponse.json([]);
-  const db = getDB();
+  const db = await getDB();
   const hits: { href: string; title: string; sub: string; kind: string }[] = [];
 
   for (const c of db.cases) {

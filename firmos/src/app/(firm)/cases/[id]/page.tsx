@@ -5,9 +5,9 @@ import { requireUser, canSeeFees } from "@/lib/auth";
 import { recordHearing } from "@/lib/actions";
 import { Card, PageTitle, Badge, Button, toneForDocStatus, rupees, Empty } from "@/components/ui";
 
-export default function CaseDetail({ params }: { params: { id: string } }) {
-  const user = requireUser(["admin", "associate", "clerk"]);
-  const db = getDB();
+export default async function CaseDetail({ params }: { params: { id: string } }) {
+  const user = await requireUser(["admin", "associate", "clerk"]);
+  const db = await getDB();
   const kase = db.cases.find((c) => c.id === params.id);
   if (!kase) notFound();
   const court = db.courts.find((ct) => ct.id === kase.courtId);

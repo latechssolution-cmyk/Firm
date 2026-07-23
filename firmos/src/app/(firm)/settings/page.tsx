@@ -3,9 +3,9 @@ import { requireUser } from "@/lib/auth";
 import { resetDemoData } from "@/lib/actions";
 import { PageTitle, Card, Badge, Button } from "@/components/ui";
 
-export default function SettingsPage() {
-  requireUser(["admin"]);
-  const db = getDB();
+export default async function SettingsPage() {
+  await requireUser(["admin"]);
+  const db = await getDB();
   const integrations = [
     { name: "SMS gateway (branded mask)", env: "SMS_GATEWAY_KEY", configured: !!process.env.SMS_GATEWAY_KEY },
     { name: "WhatsApp Business Cloud API", env: "WHATSAPP_TOKEN", configured: !!process.env.WHATSAPP_TOKEN },

@@ -3,9 +3,9 @@ import { requireUser } from "@/lib/auth";
 import { setInquiryStatus } from "@/lib/actions";
 import { PageTitle, Card, Badge, Button, Empty } from "@/components/ui";
 
-export default function InquiriesPage() {
-  requireUser(["admin", "associate", "clerk"]);
-  const db = getDB();
+export default async function InquiriesPage() {
+  await requireUser(["admin", "associate", "clerk"]);
+  const db = await getDB();
   return (
     <div>
       <PageTitle right={<a href="/reception" className="text-sm">Open AI receptionist ↗</a>}>Inquiries</PageTitle>

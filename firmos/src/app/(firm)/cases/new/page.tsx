@@ -3,9 +3,9 @@ import { requireUser } from "@/lib/auth";
 import { createCase } from "@/lib/actions";
 import { Card, PageTitle, Button } from "@/components/ui";
 
-export default function NewCasePage() {
-  requireUser(["admin", "associate", "clerk"]);
-  const db = getDB();
+export default async function NewCasePage() {
+  await requireUser(["admin", "associate", "clerk"]);
+  const db = await getDB();
   return (
     <div className="max-w-2xl">
       <PageTitle>New Case</PageTitle>

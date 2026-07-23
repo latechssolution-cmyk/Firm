@@ -4,9 +4,9 @@ import { requireUser, canSeeFees } from "@/lib/auth";
 import { Card, Stat, Badge, PageTitle, toneForReadiness, rupees, Empty } from "@/components/ui";
 import { GlobalSearch } from "@/components/GlobalSearch";
 
-export default function Dashboard() {
-  const user = requireUser(["admin", "associate", "clerk"]);
-  const db = getDB();
+export default async function Dashboard() {
+  const user = await requireUser(["admin", "associate", "clerk"]);
+  const db = await getDB();
   const tomorrow = (() => { const d = new Date(); d.setDate(d.getDate() + 1); return d.toISOString().slice(0, 10); })();
 
   const active = db.cases.filter((c) => c.status === "active");

@@ -3,9 +3,9 @@ import { getDB } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { PageTitle, Card, Badge, toneForReadiness, Empty } from "@/components/ui";
 
-export default function DiaryPage() {
-  requireUser(["admin", "associate", "clerk"]);
-  const db = getDB();
+export default async function DiaryPage() {
+  await requireUser(["admin", "associate", "clerk"]);
+  const db = await getDB();
   const today = new Date().toISOString().slice(0, 10);
   const horizon = (() => { const d = new Date(); d.setDate(d.getDate() + 30); return d.toISOString().slice(0, 10); })();
 

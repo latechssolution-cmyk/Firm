@@ -3,9 +3,9 @@ import { getDB } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { PageTitle, Card } from "@/components/ui";
 
-export default function ClientsPage() {
-  requireUser(["admin", "associate", "clerk"]);
-  const db = getDB();
+export default async function ClientsPage() {
+  await requireUser(["admin", "associate", "clerk"]);
+  const db = await getDB();
   return (
     <div>
       <PageTitle>Clients</PageTitle>

@@ -5,9 +5,9 @@ import { Card, Badge, rupees, Empty, toneForDocStatus } from "@/components/ui";
 import { ThemeToggle } from "@/lib/theme/ThemeToggle";
 import Link from "next/link";
 
-export default function PortalPage() {
-  const user = requireUser(["client"]);
-  const db = getDB();
+export default async function PortalPage() {
+  const user = await requireUser(["client"]);
+  const db = await getDB();
   // RBAC scoping: a client sees ONLY their own cases (PRD CP-1).
   const myCases = db.cases.filter((c) => c.clientId === user.clientId);
 

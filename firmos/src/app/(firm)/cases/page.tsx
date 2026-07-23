@@ -4,9 +4,9 @@ import { requireUser } from "@/lib/auth";
 import { PageTitle, Badge, Card } from "@/components/ui";
 import { GlobalSearch } from "@/components/GlobalSearch";
 
-export default function CasesPage({ searchParams }: { searchParams: { type?: string } }) {
-  requireUser(["admin", "associate", "clerk"]);
-  const db = getDB();
+export default async function CasesPage({ searchParams }: { searchParams: { type?: string } }) {
+  await requireUser(["admin", "associate", "clerk"]);
+  const db = await getDB();
   const type = searchParams.type;
   const cases = db.cases.filter((c) => (type ? c.type === type : true));
   const types = ["civil", "criminal", "family", "writ", "appeal"];

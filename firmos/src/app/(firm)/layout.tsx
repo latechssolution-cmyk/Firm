@@ -5,9 +5,9 @@ import { logout } from "@/lib/actions";
 import { ThemeToggle } from "@/lib/theme/ThemeToggle";
 import { NavLinks } from "@/components/NavLinks";
 
-export default function FirmLayout({ children }: { children: React.ReactNode }) {
-  const user = requireUser(["admin", "associate", "clerk"]);
-  const db = getDB();
+export default async function FirmLayout({ children }: { children: React.ReactNode }) {
+  const user = await requireUser(["admin", "associate", "clerk"]);
+  const db = await getDB();
   const items = [
     { href: "/dashboard", label: "Dashboard" },
     { href: "/cases", label: "Cases" },

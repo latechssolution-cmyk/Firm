@@ -4,9 +4,9 @@ import { requireUser } from "@/lib/auth";
 import { PageTitle, Card, Badge, toneForDocStatus } from "@/components/ui";
 import { TEMPLATES } from "@/lib/templates";
 
-export default function DocumentsPage() {
-  requireUser(["admin", "associate", "clerk"]);
-  const db = getDB();
+export default async function DocumentsPage() {
+  await requireUser(["admin", "associate", "clerk"]);
+  const db = await getDB();
   return (
     <div>
       <PageTitle right={<Link href="/documents/generate" className="btn-primary themed rounded-md px-4 py-2 text-sm font-semibold no-underline">+ Generate from template</Link>}>

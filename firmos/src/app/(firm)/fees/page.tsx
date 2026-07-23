@@ -4,9 +4,9 @@ import { requireUser } from "@/lib/auth";
 import { recordPayment, sendFeeReminder } from "@/lib/actions";
 import { PageTitle, Card, Button, rupees } from "@/components/ui";
 
-export default function FeesPage() {
-  requireUser(["admin", "associate"]);
-  const db = getDB();
+export default async function FeesPage() {
+  await requireUser(["admin", "associate"]);
+  const db = await getDB();
 
   const perCase = db.cases
     .map((c) => {

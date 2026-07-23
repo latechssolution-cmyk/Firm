@@ -3,8 +3,8 @@ import { login } from "@/lib/actions";
 import { Card, Button } from "@/components/ui";
 import { ThemeToggle } from "@/lib/theme/ThemeToggle";
 
-export default function LoginPage() {
-  const db = getDB();
+export default async function LoginPage() {
+  const db = await getDB();
   const roleLabel: Record<string, string> = {
     admin: "Partner / Admin", associate: "Associate", clerk: "Munshi / Clerk", client: "Client (portal)",
   };

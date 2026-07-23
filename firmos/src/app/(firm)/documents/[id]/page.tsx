@@ -7,8 +7,8 @@ import { Card, PageTitle, Badge, Button, toneForDocStatus } from "@/components/u
 import { PrintButton } from "@/components/PrintButton";
 
 export default async function DocumentDetail({ params }: { params: { id: string } }) {
-  requireUser(["admin", "associate", "clerk"]);
-  const db = getDB();
+  await requireUser(["admin", "associate", "clerk"]);
+  const db = await getDB();
   const doc = db.documents.find((d) => d.id === params.id);
   if (!doc) notFound();
   await logDocumentView(doc.id); // every view is logged (PRD SEC-2)

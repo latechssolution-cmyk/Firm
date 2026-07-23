@@ -2,8 +2,8 @@ import { getDB } from "@/lib/db";
 import { ReceptionChat } from "@/components/ReceptionChat";
 import { ThemeToggle } from "@/lib/theme/ThemeToggle";
 
-export default function ReceptionPage() {
-  const db = getDB();
+export default async function ReceptionPage() {
+  const db = await getDB();
   return (
     <main className="mx-auto max-w-lg p-4 md:p-8">
       <div className="mb-4 flex items-center justify-between">

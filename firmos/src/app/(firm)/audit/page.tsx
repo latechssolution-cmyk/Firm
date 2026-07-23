@@ -2,9 +2,9 @@ import { getDB } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { PageTitle, Card, Badge } from "@/components/ui";
 
-export default function AuditPage({ searchParams }: { searchParams: { action?: string } }) {
-  requireUser(["admin"]);
-  const db = getDB();
+export default async function AuditPage({ searchParams }: { searchParams: { action?: string } }) {
+  await requireUser(["admin"]);
+  const db = await getDB();
   const filter = searchParams.action;
   const events = db.audit.filter((e) => (filter ? e.action === filter : true)).slice(0, 200);
   const actions = ["login", "view", "download", "edit", "create"];
