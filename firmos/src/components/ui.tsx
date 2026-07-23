@@ -54,7 +54,7 @@ export function Button({
 
 export function PageTitle({ children, right }: { children: ReactNode; right?: ReactNode }) {
   return (
-    <div className="mb-5 flex items-center justify-between gap-3">
+    <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
       <h1 className="text-xl font-bold">{children}</h1>
       {right}
     </div>

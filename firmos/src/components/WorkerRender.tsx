@@ -22,7 +22,14 @@ export function WorkerRender({ docId, workerConfigured }: { docId: string; worke
 
   useEffect(() => {
     if (!jobId) return;
+    let polls = 0;
     timer.current = setInterval(async () => {
+      polls += 1;
+      if (polls > 24) { // ~60s — worker likely offline
+        if (timer.current) clearInterval(timer.current);
+        setErr("Worker didn't respond — it may be offline. The Print/PDF button above still works.");
+        return;
+      }
       const res = await fetch(`/api/jobs/${jobId}`);
       if (!res.ok) return;
       const d = await res.json();

@@ -4,6 +4,7 @@ import { getDB } from "@/lib/db";
 import { logout } from "@/lib/actions";
 import { ThemeToggle } from "@/lib/theme/ThemeToggle";
 import { NavLinks } from "@/components/NavLinks";
+import { MobileNav } from "@/components/MobileNav";
 
 export default async function FirmLayout({ children }: { children: React.ReactNode }) {
   const user = await requireUser(["admin", "associate", "clerk"]);
@@ -42,8 +43,20 @@ export default async function FirmLayout({ children }: { children: React.ReactNo
         </div>
       </aside>
       <main className="min-w-0 flex-1 p-4 md:p-6">
-        <div className="mb-3 flex items-center justify-between md:hidden">
-          <Link href="/dashboard" className="font-bold" style={{ color: "var(--color-text-primary)" }}>{db.firm.name}</Link>
+        <div className="mb-4 flex items-center justify-between gap-2 md:hidden">
+          <div className="flex items-center gap-2">
+            <MobileNav
+              items={items}
+              userName={user.name}
+              userRole={user.role}
+              onSignOut={
+                <form action={logout}>
+                  <button type="submit" className="themed w-full rounded-md px-3 py-1.5 text-sm btn-secondary">Sign out</button>
+                </form>
+              }
+            />
+            <Link href="/dashboard" className="font-bold" style={{ color: "var(--color-text-primary)" }}>{db.firm.name}</Link>
+          </div>
           <ThemeToggle />
         </div>
         {children}
