@@ -5,6 +5,8 @@ import { requireUser } from "@/lib/auth";
 import { setDocumentStatus, logDocumentView } from "@/lib/actions";
 import { Card, PageTitle, Badge, Button, toneForDocStatus } from "@/components/ui";
 import { PrintButton } from "@/components/PrintButton";
+import { WorkerRender } from "@/components/WorkerRender";
+import { supabaseConfigured } from "@/lib/db";
 
 export default async function DocumentDetail({ params }: { params: { id: string } }) {
   await requireUser(["admin", "associate", "clerk"]);
@@ -44,6 +46,15 @@ export default async function DocumentDetail({ params }: { params: { id: string 
           <Button kind="primary">Update</Button>
         </form>
       </div>
+
+      {doc.body && (
+        <div className="mt-4 rounded-lg border p-3" style={{ borderColor: "var(--color-border-subtle)" }}>
+          <div className="mb-2 text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--color-text-secondary)" }}>
+            High-fidelity render · OCI worker
+          </div>
+          <WorkerRender docId={doc.id} workerConfigured={supabaseConfigured()} />
+        </div>
+      )}
     </div>
   );
 }

@@ -131,6 +131,29 @@ export function uid(prefix: string) {
   return `${prefix}-${Date.now().toString(36)}${Math.floor(Math.random() * 1e4).toString(36)}`;
 }
 
+export type Job = {
+  id: string; kind: "ping" | "ocr" | "pdf"; status: "queued" | "claimed" | "done" | "failed";
+  payload: unknown; result: unknown; error: string | null; claimed_by: string | null;
+};
+
+/** Enqueue a heavy-compute job for the OCI worker (PRD §4.3). Requires Supabase
+ *  (the worker polls app_jobs there); returns null in local-only mode. */
+export async function enqueueJob(kind: Job["kind"], payload: unknown): Promise<string | null> {
+  const client = sb();
+  if (!client) return null;
+  const id = uid("job");
+  const { error } = await client.from("app_jobs").insert({ id, kind, payload });
+  if (error) { console.error("[jobs] enqueue failed:", error.message); return null; }
+  return id;
+}
+
+export async function getJob(id: string): Promise<Job | null> {
+  const client = sb();
+  if (!client) return null;
+  const { data } = await client.from("app_jobs").select("*").eq("id", id).maybeSingle();
+  return (data as Job) ?? null;
+}
+
 export async function audit(e: Omit<AuditEvent, "id" | "at">) {
   const db = await getDB();
   db.audit.unshift({ ...e, id: uid("a"), at: new Date().toISOString() });
