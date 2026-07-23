@@ -101,8 +101,12 @@ async function pushAll(client: SupabaseClient, db: DB, wipe = false) {
 
 function persistLocal() {
   if (!cache) return;
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-  fs.writeFileSync(DATA_FILE, JSON.stringify(cache, null, 1), "utf-8");
+  try {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    fs.writeFileSync(DATA_FILE, JSON.stringify(cache, null, 1), "utf-8");
+  } catch {
+    // Read-only filesystem (Vercel serverless) — Supabase is the store there.
+  }
 }
 
 /** Persist: local snapshot synchronously; Supabase push in the background. */
