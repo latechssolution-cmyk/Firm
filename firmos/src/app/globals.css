@@ -1,0 +1,78 @@
+@import "../styles/tokens.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body {
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+a { color: var(--color-link); }
+a:hover { text-decoration: underline; }
+
+/* Focus: visible 2px ring in primary, never suppressed. */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Form inputs: border-interactive is mandatory (WCAG 1.4.11). */
+input, select, textarea {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-interactive);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 14px;
+  width: 100%;
+}
+input::placeholder, textarea::placeholder { color: var(--color-text-secondary); }
+
+button:disabled, [aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th {
+  text-align: left; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--color-text-secondary); padding: 8px 12px;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+td { padding: 10px 12px; border-bottom: 1px solid var(--color-border-subtle); }
+
+::selection { background: var(--color-primary); color: var(--color-on-primary); }
+
+/* Buttons — all four interactive states, both themes (§9.7.6). */
+.btn-primary { background: var(--color-primary); color: var(--color-on-primary); }
+.btn-primary:hover:not(:disabled) { background: var(--color-primary-hover); }
+.btn-primary:active:not(:disabled) { transform: translateY(1px); }
+
+.btn-secondary {
+  background: var(--color-muted-bg);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-subtle);
+}
+.btn-secondary:hover:not(:disabled) { border-color: var(--color-border-interactive); }
+.btn-secondary:active:not(:disabled) { transform: translateY(1px); }
+
+.btn-danger-outline {
+  background: transparent;
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger);
+}
+.btn-danger-outline:hover:not(:disabled) { background: var(--color-muted-bg); }
+.btn-danger-outline:active:not(:disabled) { transform: translateY(1px); }
+
+button:disabled { pointer-events: none; }
+
+.nav-link {
+  display: block; border-radius: 6px; padding: 8px 12px; font-size: 14px;
+  color: var(--color-text-secondary); text-decoration: none;
+}
+.nav-link:hover { background: var(--color-muted-bg); color: var(--color-text-primary); text-decoration: none; }
+.nav-link.active { background: var(--color-primary); color: var(--color-on-primary); font-weight: 600; }
+.nav-link.active:hover { background: var(--color-primary-hover); }

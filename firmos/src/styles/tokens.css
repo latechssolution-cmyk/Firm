@@ -1,0 +1,60 @@
+/* ============================================================
+   FirmOS design tokens — THE ONLY FILE WHERE COLOR LITERALS MAY EXIST.
+   Enforced by scripts/check-hex.mjs (CI) and scripts/check-contrast.mjs.
+
+   Corrections vs. the original spec (caught by check:contrast):
+   - border-interactive light #999999 → #8C8C8C (was 2.85:1 on white; needs ≥3:1)
+   - border-interactive dark  #6B6B6B → #757575 (was 2.91:1 on surface-elev)
+   - new --color-link: primary fails 4.5:1 as text on dark bg (3.62:1),
+     so dark links use a lightened variant (6.48:1).
+   ============================================================ */
+
+:root,
+:root[data-theme="light"] {
+  --color-bg: #F8F9FA;
+  --color-surface: #FFFFFF;
+  --color-surface-elev: #FFFFFF; /* light: elevation = 1px border, no fill change */
+  --color-text-primary: #1A1A1A;
+  --color-text-secondary: #5F6773;
+  --color-border-subtle: #DDDDDD;
+  --color-border-interactive: #8C8C8C;
+  --color-primary: #CB2957;
+  --color-primary-hover: #A71F47;
+  --color-on-primary: #FFFFFF;
+  --color-link: #CB2957;
+  --color-muted-bg: #EEEEEE;
+  --color-success: #16A34A;
+  --color-warning: #D97706;
+  --color-danger: #DC2626;
+  --color-info: #2563EB;
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --color-bg: #121212;
+  --color-surface: #1E1E1E;
+  --color-surface-elev: #242424;
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #CFCFCF;
+  --color-border-subtle: #3A3A3A;
+  --color-border-interactive: #757575;
+  --color-primary: #CB2957;
+  --color-primary-hover: #D42F62;
+  --color-on-primary: #FFFFFF;
+  --color-link: #F06A8E;
+  --color-muted-bg: #2A2A2A;
+  --color-success: #4ADE80;
+  --color-warning: #FBBF24;
+  --color-danger: #F87171;
+  --color-info: #60A5FA;
+  color-scheme: dark;
+}
+
+/* Motion: color transitions only — nothing layout-triggering. */
+@media (prefers-reduced-motion: no-preference) {
+  .themed,
+  button, a, input, select, textarea {
+    transition: background-color 180ms ease-out, color 180ms ease-out,
+      border-color 180ms ease-out;
+  }
+}

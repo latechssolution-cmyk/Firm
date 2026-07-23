@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "firmos",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "C:\\Users\\HP\\Downloads\\Firm Management system\\firmos",
+      "port": 3000
+    }
+  ]
+}
