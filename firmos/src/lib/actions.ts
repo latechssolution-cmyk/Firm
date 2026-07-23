@@ -54,7 +54,7 @@ export async function recordHearing(formData: FormData) {
     });
   }
   await audit({ userId: user.id, userName: user.name, action: "edit", entityType: "case", entityId: kase.number, detail: `Hearing recorded: ${outcome.slice(0, 60)}` });
-  persist();
+  await persist();
   revalidatePath(`/cases/${caseId}`);
   revalidatePath("/dashboard");
   revalidatePath("/diary");
@@ -82,7 +82,7 @@ export async function createCase(formData: FormData) {
     filedOn: new Date().toISOString().slice(0, 10),
   });
   await audit({ userId: user.id, userName: user.name, action: "create", entityType: "case", entityId: String(formData.get("number")) });
-  persist();
+  await persist();
   revalidatePath("/cases");
   redirect(`/cases/${id}`);
 }
@@ -100,7 +100,7 @@ export async function generateDocument(formData: FormData) {
     visibility: "firm", body, createdBy: user.id, createdAt: new Date().toISOString(),
   });
   await audit({ userId: user.id, userName: user.name, action: "create", entityType: "document", entityId: title });
-  persist();
+  await persist();
   redirect(`/documents/${id}`);
 }
 
@@ -114,7 +114,7 @@ export async function setDocumentStatus(formData: FormData) {
   doc.status = status;
   doc.visibility = visibility;
   await audit({ userId: user.id, userName: user.name, action: "edit", entityType: "document", entityId: doc.title, detail: `status=${status}, visibility=${visibility}` });
-  persist();
+  await persist();
   revalidatePath(`/documents/${doc.id}`);
   revalidatePath("/documents");
 }
@@ -134,7 +134,7 @@ export async function recordPayment(formData: FormData) {
   });
   const kase = db.cases.find((c) => c.id === caseId);
   await audit({ userId: user.id, userName: user.name, action: "edit", entityType: "fees", entityId: kase?.number ?? caseId, detail: `Payment received Rs ${amount.toLocaleString()}` });
-  persist();
+  await persist();
   revalidatePath("/fees");
   revalidatePath(`/cases/${caseId}`);
 }
@@ -153,7 +153,7 @@ export async function sendFeeReminder(formData: FormData) {
     payload: `Gentle reminder: balance pending in ${kase.title}. Kindly arrange payment at your convenience.`,
   });
   await audit({ userId: user.id, userName: user.name, action: "edit", entityType: "fees", entityId: kase.number, detail: "Fee reminder queued" });
-  persist();
+  await persist();
   revalidatePath("/fees");
 }
 
@@ -164,7 +164,7 @@ export async function setInquiryStatus(formData: FormData) {
   if (!q) return;
   q.status = String(formData.get("status")) as typeof q.status;
   await audit({ userId: user.id, userName: user.name, action: "edit", entityType: "inquiry", entityId: q.callerName, detail: `status=${q.status}` });
-  persist();
+  await persist();
   revalidatePath("/inquiries");
 }
 

@@ -2,51 +2,50 @@
    FirmOS design tokens — THE ONLY FILE WHERE COLOR LITERALS MAY EXIST.
    Enforced by scripts/check-hex.mjs (CI) and scripts/check-contrast.mjs.
 
-   Corrections vs. the original spec (caught by check:contrast):
-   - border-interactive light #999999 → #8C8C8C (was 2.85:1 on white; needs ≥3:1)
-   - border-interactive dark  #6B6B6B → #757575 (was 2.91:1 on surface-elev)
-   - new --color-link: primary fails 4.5:1 as text on dark bg (3.62:1),
-     so dark links use a lightened variant (6.48:1).
+   Palette: professional legal navy (deep blue), replacing the earlier
+   crimson accent per stakeholder direction. Navy reads as established/
+   trustworthy — the convention for law firms. Status colors kept semantic.
+   All pairings validated ≥ WCAG AA by scripts/check-contrast.mjs.
    ============================================================ */
 
 :root,
 :root[data-theme="light"] {
-  --color-bg: #F8F9FA;
+  --color-bg: #F4F6F8;
   --color-surface: #FFFFFF;
   --color-surface-elev: #FFFFFF; /* light: elevation = 1px border, no fill change */
-  --color-text-primary: #1A1A1A;
-  --color-text-secondary: #5F6773;
-  --color-border-subtle: #DDDDDD;
-  --color-border-interactive: #8C8C8C;
-  --color-primary: #CB2957;
-  --color-primary-hover: #A71F47;
+  --color-text-primary: #16202E;
+  --color-text-secondary: #566072;
+  --color-border-subtle: #DCE0E6;
+  --color-border-interactive: #767F8E;
+  --color-primary: #1D4ED8;          /* navy-blue — actions, active nav */
+  --color-primary-hover: #1A3FAE;
   --color-on-primary: #FFFFFF;
-  --color-link: #CB2957;
-  --color-muted-bg: #EEEEEE;
-  --color-success: #16A34A;
-  --color-warning: #D97706;
-  --color-danger: #DC2626;
-  --color-info: #2563EB;
+  --color-link: #1D4ED8;
+  --color-muted-bg: #EAEDF1;
+  --color-success: #157F3C;
+  --color-warning: #B45309;
+  --color-danger: #C42B2B;
+  --color-info: #0E7490;             /* teal — distinct from navy primary */
   color-scheme: light;
 }
 
 :root[data-theme="dark"] {
-  --color-bg: #121212;
-  --color-surface: #1E1E1E;
-  --color-surface-elev: #242424;
-  --color-text-primary: #FFFFFF;
-  --color-text-secondary: #CFCFCF;
-  --color-border-subtle: #3A3A3A;
-  --color-border-interactive: #757575;
-  --color-primary: #CB2957;
-  --color-primary-hover: #D42F62;
+  --color-bg: #0F1520;
+  --color-surface: #172032;
+  --color-surface-elev: #1E293B;
+  --color-text-primary: #F1F5F9;
+  --color-text-secondary: #A9B4C4;
+  --color-border-subtle: #2C3A4F;
+  --color-border-interactive: #64748B;
+  --color-primary: #2E63E6;          /* navy-blue, lightened for dark surfaces */
+  --color-primary-hover: #1D4ED8;
   --color-on-primary: #FFFFFF;
-  --color-link: #F06A8E;
-  --color-muted-bg: #2A2A2A;
+  --color-link: #7CA9F5;
+  --color-muted-bg: #223049;
   --color-success: #4ADE80;
   --color-warning: #FBBF24;
   --color-danger: #F87171;
-  --color-info: #60A5FA;
+  --color-info: #38BDF8;
   color-scheme: dark;
 }
 

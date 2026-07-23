@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
         channel: "whatsapp", template: urgent ? "urgent-inquiry" : "new-inquiry",
         payload: `${urgent ? "⚑ URGENT — " : ""}New inquiry: ${s.matter} — ${s.summary?.slice(0, 80)} · Callback ${slot} · ${s.name} ${s.phone}`,
       });
-      persist();
+      await persist();
       reply = `Done — your callback is booked for ${slot}. ${urgent ? "Your matter has been flagged urgent and forwarded to the advocate immediately. " : ""}Is there anything else I can note for the advocate?`;
     } else {
       reply = "No problem — your details are saved and the office will reach out during working hours. Anything else I can note?";
@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
         urgency: urgent ? "urgent" : "normal", status: "new",
         transcript: messages, createdAt: new Date().toISOString(),
       });
-      persist();
+      await persist();
     }
   } else {
     reply = "Noted — I've added that to your inquiry. The advocate's office will be in touch. Allah Hafiz!";
