@@ -146,6 +146,8 @@ Multi-tenant SaaS. One production deployment serves all firms; tenant isolation 
 
 **Platform constraint (decided): the entire system runs on Vercel + Supabase only.** No separate container fleet, no self-managed servers. Anything that cannot run in this pair is either replaced with an API-based managed service called *from* it, or explicitly deferred (noted below).
 
+> **HARD RULE — free tier only.** Every service must stay within its provider's free tier; never provision anything that incurs charges. Vercel Hobby, Supabase Free (500 MB DB / 1 GB storage), and Oracle Cloud Always-Free (≤ 2× E2.1.Micro AMD *or* ≤ 4 ARM A1.Flex OCPUs / 24 GB; ≤ 200 GB block storage; no load balancers). Before creating any cloud resource, confirm it falls in the free tier; if a task would require paid resources, stop and raise it rather than provisioning. The optional OCI worker (below) is sized to Always-Free.
+
 | Layer | Choice | Rationale & constraints |
 |---|---|---|
 | Web apps + API (firm app, client portal, REST endpoints, integration webhooks) | **Next.js + TypeScript + Tailwind on Vercel** — API routes/serverless functions for all synchronous API work and webhook receivers (WhatsApp, payment gateway) | Webhook handlers ack fast and enqueue to Supabase Queues; per-tenant subdomain/custom-domain routing via middleware + Vercel wildcard domains; PWA support |
