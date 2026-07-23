@@ -263,6 +263,18 @@ Priority: **P0** = required for pilot-ready production launch · **P1** = fast-f
 | IM-2 | Bulk scan ingestion (DA-5) with OCR and review queue | P0 |
 | IM-3 | Onboarding checklist workflow per new tenant (LaTech-side): import → verify counts with munshi → training sessions logged → go-live sign-off | P0 |
 
+### 5.9 Smart features & automation (implemented)
+Intelligence layer that turns records into action (`src/lib/insights.ts`, pure/tested functions):
+| ID | Requirement | Pri |
+|---|---|---|
+| SM-1 | **Needs-Attention feed** on the dashboard — prioritized (high/medium/low): urgent inquiries, tomorrow's unprepared hearings, approaching limitation deadlines (≤14d), overdue fees on aged cases, stale cases with no scheduled date | P0 |
+| SM-2 | **Limitation-deadline calculator** — derives appeal/revision/limitation deadlines (Limitation Act periods) from decided/filed dates + a manual override; surfaced on case detail with days-left urgency badges | P0 |
+| SM-3 | **Conflict-of-interest check** — live as-you-type warning on new-case intake when a party already appears in another matter (CM-8) | P0 |
+| SM-4 | **AI case brief** — one-click Claude-generated status summary + next steps from case records, with a deterministic fallback when no API key | P0 |
+| SM-5 | **Stage auto-advance** — suggests the next lifecycle stage (per case type) when recording a hearing outcome | P0 |
+| SM-6 | **Automations** — day-before hearing-reminder digest (bulk), bulk overdue-fee reminders, one-click convert-inquiry-to-client; each queues real notifications and gives toast feedback | P0 |
+| SM-7 | **Fee analytics** — collection rate, receivables, cases-with-balance on dashboard + fees page | P0 |
+
 ## 6. Explicitly no longer out of scope (v2 → v3 conversions)
 
 Every v2 exclusion is now specified as real: multi-tenancy (§4.2), SMS/WhatsApp gateway (§5.5, §7.2), payments (§5.6, §7.3), AI receptionist live channels (§5.4, §7.4), mobile via PWA + offline cache (§4.3), real backups/DR (§9.3). Remaining true exclusions: **native app-store apps** (PWA covers the need; revisit on demand) and **court e-filing integration** (no public firm-facing filing API exists in Pakistan; tracked as CM-11 status-pull only).
