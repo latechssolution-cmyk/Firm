@@ -3,6 +3,7 @@ import { requireUser } from "@/lib/auth";
 import { setInquiryStatus, convertInquiry, createInquiry, deleteInquiry } from "@/lib/actions";
 import { PageTitle, Card, Badge, Button, Empty } from "@/components/ui";
 import { DeleteButton } from "@/components/DeleteButton";
+import { SubmitButton } from "@/components/SubmitButton";
 import { Collapsible } from "@/components/Collapsible";
 
 export default async function InquiriesPage() {
@@ -30,7 +31,7 @@ export default async function InquiriesPage() {
             <label className="text-sm md:col-span-2">Summary
               <textarea name="summary" rows={2} className="mt-1" />
             </label>
-            <div className="md:col-span-2"><Button kind="primary">Log inquiry</Button></div>
+            <div className="md:col-span-2"><SubmitButton>Log inquiry</SubmitButton></div>
           </form>
         </Card>
       </Collapsible>

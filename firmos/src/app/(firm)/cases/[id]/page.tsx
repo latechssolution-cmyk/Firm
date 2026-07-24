@@ -4,6 +4,7 @@ import { getDB } from "@/lib/db";
 import { requireUser, canSeeFees } from "@/lib/auth";
 import { recordHearing, deleteCase, deleteHearing, addFeeEntry, deleteFeeEntry } from "@/lib/actions";
 import { Card, PageTitle, Badge, Button, toneForDocStatus, rupees, Empty } from "@/components/ui";
+import { SubmitButton } from "@/components/SubmitButton";
 import { CaseSummary } from "@/components/CaseSummary";
 import { DeleteButton } from "@/components/DeleteButton";
 import { IconClock, IconSparkle } from "@/components/icons";
@@ -107,7 +108,7 @@ export default async function CaseDetail({ params }: { params: { id: string } })
                   ))}
                 </select>
               </label>
-              <div className="md:col-span-2"><Button kind="primary">Save hearing</Button></div>
+              <div className="md:col-span-2"><SubmitButton>Save hearing</SubmitButton></div>
             </form>
           </Card>
         </div>

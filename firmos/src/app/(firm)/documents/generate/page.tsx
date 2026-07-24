@@ -2,6 +2,7 @@ import { getDB } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { generateDocument } from "@/lib/actions";
 import { Card, PageTitle, Button } from "@/components/ui";
+import { SubmitButton } from "@/components/SubmitButton";
 import { TEMPLATES } from "@/lib/templates";
 
 export default async function GeneratePage({ searchParams }: { searchParams: { template?: string; caseId?: string } }) {
@@ -38,7 +39,7 @@ export default async function GeneratePage({ searchParams }: { searchParams: { t
           <label className="text-sm">Draft (auto-filled from case &amp; client fields — edit freely)
             <textarea name="body" rows={20} defaultValue={body} className="mt-1 font-mono text-xs" />
           </label>
-          <div className="mt-3"><Button kind="primary">Save as draft</Button></div>
+          <div className="mt-3"><SubmitButton>Save as draft</SubmitButton></div>
         </form>
       </Card>
     </div>
