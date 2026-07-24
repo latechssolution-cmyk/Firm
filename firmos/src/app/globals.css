@@ -106,9 +106,15 @@ button:disabled { pointer-events: none; }
 /* Elevation utilities — soft shadows + hover lift. */
 .card {
   box-shadow: var(--shadow-sm);
-  transition: box-shadow 200ms ease-out, transform 200ms ease-out, border-color 200ms ease-out;
+  transition: box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1), transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 220ms ease-out, background-color 200ms ease-out;
 }
-.card-hover:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+/* Hover: lift + a hairline emerald ring (via box-shadow so it never fights the
+   card's inline border). Reads as a gentle, premium raise. */
+.card-hover:hover {
+  box-shadow: var(--shadow-md), 0 0 0 1px color-mix(in srgb, var(--color-primary) 22%, transparent);
+  transform: translateY(-3px);
+}
 
 /* Inputs get a soft focus glow in addition to the outline ring. */
 input:focus-visible, select:focus-visible, textarea:focus-visible {
@@ -172,6 +178,25 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
     radial-gradient(120% 120% at 100% 0%, color-mix(in srgb, var(--color-primary) 55%, transparent) 0%, transparent 55%),
     linear-gradient(140deg, var(--color-accent-surface) 0%, color-mix(in srgb, var(--color-accent-surface) 82%, black) 100%);
 }
+/* The featured card gently "breathes" an emerald glow — alive but never busy. */
+@media (prefers-reduced-motion: no-preference) {
+  .accent-gradient { animation: accent-breathe 7s ease-in-out infinite; }
+  @keyframes accent-breathe {
+    0%, 100% { box-shadow: var(--shadow-md); }
+    50% { box-shadow: var(--shadow-md), 0 0 26px color-mix(in srgb, var(--color-primary) 24%, transparent); }
+  }
+  /* In-page anchor jumps ease instead of snapping. */
+  html { scroll-behavior: smooth; }
+}
+
+/* Title accent — a short emerald underline that grows in under each page title. */
+.title-accent {
+  display: block; height: 3px; width: 34px; border-radius: 9999px;
+  margin-top: 7px; background: var(--color-primary);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .title-accent { transform-origin: left center; animation: bar-grow 620ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+}
 
 /* Shimmer skeleton for loading states. */
 .skeleton {
@@ -204,13 +229,17 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
   display: flex; align-items: center; gap: 10px;
   border-radius: 8px; padding: 9px 12px; font-size: 14px; font-weight: 500;
   color: var(--color-text-secondary); text-decoration: none;
-  transition: background-color 140ms ease-out, color 140ms ease-out;
+  transition: background-color 140ms ease-out, color 140ms ease-out, transform 160ms cubic-bezier(0.16, 1, 0.3, 1);
 }
-.nav-link svg { flex-shrink: 0; }
+.nav-link svg { flex-shrink: 0; transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1); }
+.nav-link:not(.active):hover { transform: translateX(3px); }
 
-/* Clickable table rows (e.g. the cases list) — the whole row opens the record. */
+/* Clickable table rows (e.g. the cases list) — the whole row opens the record,
+   with a growing emerald accent on the leading cell for a premium feel. */
 .row-link { cursor: pointer; transition: background-color 120ms ease-out; }
 .row-link:hover { background: var(--color-muted-bg); }
+.row-link td:first-child { box-shadow: inset 0 0 0 0 var(--color-primary); transition: box-shadow 160ms cubic-bezier(0.16, 1, 0.3, 1); }
+.row-link:hover td:first-child { box-shadow: inset 3px 0 0 0 var(--color-primary); }
 .nav-link:hover { background: var(--color-muted-bg); color: var(--color-text-primary); text-decoration: none; }
 .nav-link.active { background: var(--color-primary); color: var(--color-on-primary); font-weight: 600; box-shadow: var(--shadow-sm); }
 .nav-link.active:hover { background: var(--color-primary-hover); }
@@ -223,9 +252,10 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
   padding: 5px 14px; font-size: 13px; font-weight: 600; text-decoration: none;
   color: var(--color-text-secondary); border: 1px solid var(--color-border-subtle);
   background: var(--color-surface);
-  transition: background-color 140ms ease-out, color 140ms ease-out, border-color 140ms ease-out, box-shadow 140ms ease-out;
+  transition: background-color 140ms ease-out, color 140ms ease-out, border-color 140ms ease-out, box-shadow 140ms ease-out, transform 140ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 .chip:hover { color: var(--color-text-primary); border-color: var(--color-border-interactive); text-decoration: none; }
+.chip:not(.active):hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
 .chip.active {
   background: var(--color-primary); color: var(--color-on-primary);
   border-color: transparent; box-shadow: var(--shadow-sm);

@@ -37,7 +37,7 @@ export function Stat({ label, value, sub, tone, icon, featured = false }: { labe
             <span className="flex h-7 w-7 items-center justify-center rounded-lg" style={{ background: "color-mix(in srgb, var(--color-on-accent) 18%, transparent)" }}>{icon}</span>
           )}
         </div>
-        <div className="mt-2 text-[28px] font-bold leading-none tracking-tight">{value}</div>
+        <div className="mt-2 text-[28px] font-bold leading-none tracking-tight tabular-nums">{value}</div>
         {sub && <div className="mt-1.5 text-xs" style={{ opacity: 0.8 }}>{sub}</div>}
       </div>
     );
@@ -51,7 +51,7 @@ export function Stat({ label, value, sub, tone, icon, featured = false }: { labe
             style={{ background: "var(--color-muted-bg)", color: "var(--color-primary)" }}>{icon}</span>
         )}
       </div>
-      <div className="mt-2 text-[28px] font-bold leading-none tracking-tight" style={{ color: tone ? `var(--color-${tone})` : "var(--color-text-primary)" }}>{value}</div>
+      <div className="mt-2 text-[28px] font-bold leading-none tracking-tight tabular-nums" style={{ color: tone ? `var(--color-${tone})` : "var(--color-text-primary)" }}>{value}</div>
       {sub && <div className="mt-1.5 text-xs" style={{ color: "var(--color-text-secondary)" }}>{sub}</div>}
     </Card>
   );
@@ -89,7 +89,10 @@ export function Button({
 export function PageTitle({ children, right }: { children: ReactNode; right?: ReactNode }) {
   return (
     <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-      <h1 className="font-display text-2xl font-bold">{children}</h1>
+      <div>
+        <h1 className="font-display text-2xl font-bold">{children}</h1>
+        <span className="title-accent" aria-hidden />
+      </div>
       {right}
     </div>
   );
