@@ -10,7 +10,8 @@ import { IconCases } from "@/components/icons";
 export default async function FirmLayout({ children }: { children: React.ReactNode }) {
   const user = await requireUser(["admin", "associate", "clerk"]);
   const db = await getDB();
-  const items = [
+  // Flat list for the mobile menu; sectioned list for the desktop sidebar.
+  const navItems = [
     { href: "/dashboard", label: "Dashboard" },
     { href: "/cases", label: "Cases" },
     { href: "/diary", label: "Court Diary" },
@@ -19,6 +20,19 @@ export default async function FirmLayout({ children }: { children: React.ReactNo
     ...(canSeeFees(user) ? [{ href: "/fees", label: "Fees & Billing" }] : []),
     { href: "/inquiries", label: "Inquiries" },
     ...(user.role === "admin" ? [{ href: "/audit", label: "Audit Log" }, { href: "/settings", label: "Settings" }] : []),
+  ];
+  const items = navItems;
+  const sectioned = [
+    { section: "Practice" },
+    { href: "/dashboard", label: "Dashboard" },
+    { href: "/cases", label: "Cases" },
+    { href: "/diary", label: "Court Diary" },
+    { href: "/clients", label: "Clients" },
+    { section: "Workspace" },
+    { href: "/documents", label: "Documents" },
+    ...(canSeeFees(user) ? [{ href: "/fees", label: "Fees & Billing" }] : []),
+    { href: "/inquiries", label: "Inquiries" },
+    ...(user.role === "admin" ? [{ section: "Admin" }, { href: "/audit", label: "Audit Log" }, { href: "/settings", label: "Settings" }] : []),
   ];
   return (
     <div className="flex min-h-screen">
@@ -36,7 +50,7 @@ export default async function FirmLayout({ children }: { children: React.ReactNo
             <div className="truncate text-xs" style={{ color: "var(--color-text-secondary)" }}>{db.firm.nameUrdu}</div>
           </div>
         </div>
-        <NavLinks items={items} />
+        <NavLinks items={sectioned} />
         <div className="mt-auto flex flex-col gap-2 pt-4">
           <div className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
             {user.name} · {user.role}

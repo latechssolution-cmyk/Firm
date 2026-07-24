@@ -2,60 +2,63 @@
    FirmOS design tokens — THE ONLY FILE WHERE COLOR LITERALS MAY EXIST.
    Enforced by scripts/check-hex.mjs (CI) and scripts/check-contrast.mjs.
 
-   Palette: professional legal navy (deep blue), replacing the earlier
-   crimson accent per stakeholder direction. Navy reads as established/
-   trustworthy — the convention for law firms. Status colors kept semantic.
-   All pairings validated ≥ WCAG AA by scripts/check-contrast.mjs.
+   Palette v3 — "Donezo" emerald: clean warm-neutral canvas, deep emerald
+   accent, one filled featured surface. Light = airy & white; dark = deep
+   charcoal-green with a vibrant emerald accent. All pairings ≥ WCAG AA.
    ============================================================ */
 
 :root,
 :root[data-theme="light"] {
-  --color-bg: #F4F6F8;
+  --color-bg: #F4F6F4;
   --color-surface: #FFFFFF;
-  --color-surface-elev: #FFFFFF; /* light: elevation = 1px border, no fill change */
-  --color-text-primary: #16202E;
-  --color-text-secondary: #566072;
-  --color-border-subtle: #DCE0E6;
-  --color-border-interactive: #767F8E;
-  --color-primary: #1D4ED8;          /* navy-blue — actions, active nav */
-  --color-primary-hover: #1A3FAE;
+  --color-surface-elev: #FFFFFF;
+  --color-text-primary: #131815;
+  --color-text-secondary: #5B6660;
+  --color-border-subtle: #E4E8E4;
+  --color-border-interactive: #79847D;
+  --color-primary: #0B7A50;          /* deep emerald — actions, active nav, links */
+  --color-primary-hover: #096440;
   --color-on-primary: #FFFFFF;
-  --color-link: #1D4ED8;
-  --color-muted-bg: #EAEDF1;
+  --color-accent-surface: #0E5C41;   /* filled "featured" card background */
+  --color-on-accent: #FFFFFF;
+  --color-link: #0B7A50;
+  --color-muted-bg: #EAEEEA;
   --color-success: #157F3C;
   --color-warning: #B45309;
   --color-danger: #C42B2B;
-  --color-info: #0E7490;             /* teal — distinct from navy primary */
-  /* Elevation — soft, layered shadows (light theme). */
-  --shadow-sm: 0 1px 2px rgba(16, 32, 46, 0.04), 0 1px 3px rgba(16, 32, 46, 0.06);
-  --shadow-md: 0 2px 6px rgba(16, 32, 46, 0.06), 0 6px 16px rgba(16, 32, 46, 0.08);
-  --shadow-lg: 0 8px 20px rgba(16, 32, 46, 0.10), 0 20px 40px rgba(16, 32, 46, 0.12);
-  --shadow-focus: 0 0 0 3px rgba(29, 78, 216, 0.18);
+  --color-info: #2563EB;
+  /* Elevation — soft, layered shadows (light). */
+  --shadow-sm: 0 1px 2px rgba(19, 24, 21, 0.05), 0 1px 3px rgba(19, 24, 21, 0.06);
+  --shadow-md: 0 2px 6px rgba(19, 24, 21, 0.06), 0 8px 20px rgba(19, 24, 21, 0.08);
+  --shadow-lg: 0 10px 24px rgba(19, 24, 21, 0.10), 0 24px 48px rgba(19, 24, 21, 0.12);
+  --shadow-focus: 0 0 0 3px rgba(11, 122, 80, 0.18);
   color-scheme: light;
 }
 
 :root[data-theme="dark"] {
-  --color-bg: #0F1520;
-  --color-surface: #172032;
-  --color-surface-elev: #1E293B;
-  --color-text-primary: #F1F5F9;
-  --color-text-secondary: #A9B4C4;
-  --color-border-subtle: #2C3A4F;
-  --color-border-interactive: #64748B;
-  --color-primary: #2E63E6;          /* navy-blue, lightened for dark surfaces */
-  --color-primary-hover: #1D4ED8;
-  --color-on-primary: #FFFFFF;
-  --color-link: #7CA9F5;
-  --color-muted-bg: #223049;
+  --color-bg: #0E1512;
+  --color-surface: #16201B;
+  --color-surface-elev: #1D2A22;
+  --color-text-primary: #ECF2EE;
+  --color-text-secondary: #98A79E;
+  --color-border-subtle: #29352E;
+  --color-border-interactive: #6E8177;
+  --color-primary: #10B981;          /* vibrant emerald — punchy on dark */
+  --color-primary-hover: #34D399;
+  --color-on-primary: #052018;       /* dark text on the bright accent */
+  --color-accent-surface: #0E5C41;
+  --color-on-accent: #ECF2EE;
+  --color-link: #34D399;
+  --color-muted-bg: #223029;
   --color-success: #4ADE80;
   --color-warning: #FBBF24;
   --color-danger: #F87171;
-  --color-info: #38BDF8;
+  --color-info: #60A5FA;
   /* Elevation — deeper shadows read against the dark canvas. */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.30), 0 1px 3px rgba(0, 0, 0, 0.24);
-  --shadow-md: 0 3px 8px rgba(0, 0, 0, 0.38), 0 8px 20px rgba(0, 0, 0, 0.34);
-  --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.46), 0 24px 48px rgba(0, 0, 0, 0.42);
-  --shadow-focus: 0 0 0 3px rgba(46, 99, 230, 0.30);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.32), 0 1px 3px rgba(0, 0, 0, 0.26);
+  --shadow-md: 0 3px 8px rgba(0, 0, 0, 0.40), 0 8px 22px rgba(0, 0, 0, 0.36);
+  --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.48), 0 28px 56px rgba(0, 0, 0, 0.44);
+  --shadow-focus: 0 0 0 3px rgba(16, 185, 129, 0.28);
   color-scheme: dark;
 }
 

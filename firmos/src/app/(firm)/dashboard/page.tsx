@@ -30,8 +30,8 @@ export default async function Dashboard() {
     <div>
       <PageTitle right={<GlobalSearch />}>Practice Overview</PageTitle>
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Stat label="Active cases" value={String(active.length)} sub="All courts" icon={<IconCases size={18} />} />
+      <div className="stagger grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Stat featured label="Active cases" value={String(active.length)} sub="Across all courts" icon={<IconCases size={18} />} />
         <Stat label="Hearings tomorrow" value={String(tomorrowHearings.length)} sub="Cause list ready" tone="info" icon={<IconDiary size={18} />} />
         {canSeeFees(user)
           ? <Stat label="Fees pending" value={rupees(fa.pending)} sub={`${fa.collectionRate}% collected`} tone="warning" icon={<IconFees size={18} />} />
@@ -54,7 +54,7 @@ export default async function Dashboard() {
                   <span style={{ color: "var(--color-text-secondary)" }}>{n} ({Math.round((n / total) * 100)}%)</span>
                 </div>
                 <div className="h-2 w-full rounded-full" style={{ background: "var(--color-muted-bg)" }}>
-                  <div className="h-2 rounded-full" style={{ width: `${(n / total) * 100}%`, background: "var(--color-info)" }} />
+                  <div className="bar-grow h-2 rounded-full" style={{ width: `${(n / total) * 100}%`, background: "var(--color-primary)" }} />
                 </div>
               </div>
             ))}

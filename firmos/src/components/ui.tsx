@@ -7,7 +7,7 @@ export function LinkButton({ href, children, kind = "primary", className = "" }:
 }) {
   const cls = kind === "primary" ? "btn-primary" : "btn-secondary";
   return (
-    <Link href={href} className={`themed ${cls} inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold no-underline ${className}`}>
+    <Link href={href} className={`themed ${cls} inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold no-underline ${className}`}>
       {children}
     </Link>
   );
@@ -16,7 +16,7 @@ export function LinkButton({ href, children, kind = "primary", className = "" }:
 export function Card({ children, elevated = false, hover = false, className = "" }: { children: ReactNode; elevated?: boolean; hover?: boolean; className?: string }) {
   return (
     <div
-      className={`themed card rounded-xl p-5 ${hover ? "card-hover" : ""} ${className}`}
+      className={`themed card rounded-2xl p-5 ${hover ? "card-hover" : ""} ${className}`}
       style={{
         background: elevated ? "var(--color-surface-elev)" : "var(--color-surface)",
         border: "1px solid var(--color-border-subtle)",
@@ -27,14 +27,28 @@ export function Card({ children, elevated = false, hover = false, className = ""
   );
 }
 
-export function Stat({ label, value, sub, tone, icon }: { label: string; value: string; sub?: string; tone?: "success" | "warning" | "danger" | "info"; icon?: ReactNode }) {
+export function Stat({ label, value, sub, tone, icon, featured = false }: { label: string; value: string; sub?: string; tone?: "success" | "warning" | "danger" | "info"; icon?: ReactNode; featured?: boolean }) {
+  if (featured) {
+    return (
+      <div className="themed card card-hover rounded-2xl p-5" style={{ background: "var(--color-accent-surface)", color: "var(--color-on-accent)", border: "1px solid transparent", boxShadow: "var(--shadow-md)" }}>
+        <div className="flex items-center justify-between gap-2">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.08em]" style={{ opacity: 0.85 }}>{label}</div>
+          {icon && (
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg" style={{ background: "color-mix(in srgb, var(--color-on-accent) 18%, transparent)" }}>{icon}</span>
+          )}
+        </div>
+        <div className="mt-2 text-[28px] font-bold leading-none tracking-tight">{value}</div>
+        {sub && <div className="mt-1.5 text-xs" style={{ opacity: 0.8 }}>{sub}</div>}
+      </div>
+    );
+  }
   return (
-    <Card>
+    <Card hover>
       <div className="flex items-center justify-between gap-2">
         <div className="text-[11px] font-semibold uppercase tracking-[0.08em]" style={{ color: "var(--color-text-secondary)" }}>{label}</div>
         {icon && (
           <span className="flex h-7 w-7 items-center justify-center rounded-lg"
-            style={{ background: "var(--color-muted-bg)", color: "var(--color-text-secondary)" }}>{icon}</span>
+            style={{ background: "var(--color-muted-bg)", color: "var(--color-primary)" }}>{icon}</span>
         )}
       </div>
       <div className="mt-2 text-[28px] font-bold leading-none tracking-tight" style={{ color: tone ? `var(--color-${tone})` : "var(--color-text-primary)" }}>{value}</div>
@@ -63,7 +77,7 @@ export function Button({
   children: ReactNode; kind?: "primary" | "secondary" | "danger-outline"; disabled?: boolean;
   type?: "submit" | "button"; formAction?: (formData: FormData) => void; onClick?: () => void;
 }) {
-  const base = "themed rounded-lg px-4 py-2 text-sm font-semibold";
+  const base = "themed rounded-full px-4 py-2 text-sm font-semibold";
   const cls = kind === "primary" ? "btn-primary" : kind === "danger-outline" ? "btn-danger-outline" : "btn-secondary";
   return (
     <button type={type} disabled={disabled} formAction={formAction} onClick={onClick} className={`${base} ${cls}`}>
