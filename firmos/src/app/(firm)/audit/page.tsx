@@ -11,10 +11,10 @@ export default async function AuditPage({ searchParams }: { searchParams: { acti
   return (
     <div>
       <PageTitle>Audit Log</PageTitle>
-      <div className="mb-4 flex flex-wrap gap-2 text-sm">
-        <a href="/audit" className={`nav-link themed !py-1 ${!filter ? "active" : ""}`}>All</a>
+      <div className="mb-4 flex flex-wrap gap-2">
+        <a href="/audit" className={`chip themed ${!filter ? "active" : ""}`}>All</a>
         {actions.map((a) => (
-          <a key={a} href={`/audit?action=${a}`} className={`nav-link themed !py-1 capitalize ${filter === a ? "active" : ""}`}>{a}</a>
+          <a key={a} href={`/audit?action=${a}`} className={`chip themed capitalize ${filter === a ? "active" : ""}`}>{a}</a>
         ))}
       </div>
       <Card className="overflow-x-auto !p-0">

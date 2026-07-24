@@ -44,27 +44,40 @@ export function ReceptionChat() {
   }
 
   return (
-    <div className="themed flex h-[480px] flex-col rounded-lg border" style={{ background: "var(--color-surface)", borderColor: "var(--color-border-subtle)" }}>
-      <div className="flex items-center justify-between border-b px-4 py-2" style={{ borderColor: "var(--color-border-subtle)" }}>
-        <span className="text-sm font-bold">AI RECEPTIONIST · LIVE</span>
-        {urgent && <span className="text-xs font-bold" style={{ color: "var(--color-danger)" }}>⚑ FLAGGED URGENT</span>}
+    <div className="themed card flex h-[480px] flex-col rounded-2xl border" style={{ background: "var(--color-surface)", borderColor: "var(--color-border-subtle)" }}>
+      <div className="flex items-center justify-between border-b px-4 py-3" style={{ borderColor: "var(--color-border-subtle)" }}>
+        <span className="flex items-center gap-2 text-sm font-bold">
+          <span className="live-dot h-2 w-2 rounded-full" style={{ background: "var(--color-success)" }} />
+          AI Receptionist · Live
+        </span>
+        {urgent && <span className="rounded-full px-2 py-0.5 text-[11px] font-bold uppercase" style={{ color: "var(--color-danger)", background: "color-mix(in srgb, var(--color-danger) 12%, transparent)" }}>⚑ Urgent</span>}
       </div>
       <div className="flex-1 overflow-auto p-4">
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-3">
           {messages.map((m, i) => (
-            <div
-              key={i}
-              className="max-w-[85%] rounded-lg px-3 py-2 text-sm"
-              style={
-                m.from === "assistant"
-                  ? { background: "var(--color-muted-bg)", alignSelf: "flex-start" }
-                  : { background: "var(--color-primary)", color: "var(--color-on-primary)", alignSelf: "flex-end" }
-              }
-            >
-              {m.text}
+            <div key={i} className={`flex items-end gap-2 ${m.from === "assistant" ? "" : "flex-row-reverse"}`}>
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold"
+                style={m.from === "assistant"
+                  ? { background: "var(--color-primary)", color: "var(--color-on-primary)" }
+                  : { background: "var(--color-muted-bg)", color: "var(--color-text-secondary)" }}>
+                {m.from === "assistant" ? "AI" : "You"}
+              </span>
+              <div className="max-w-[80%] rounded-2xl px-3.5 py-2 text-sm"
+                style={m.from === "assistant"
+                  ? { background: "var(--color-muted-bg)", borderBottomLeftRadius: 4 }
+                  : { background: "var(--color-primary)", color: "var(--color-on-primary)", borderBottomRightRadius: 4 }}>
+                {m.text}
+              </div>
             </div>
           ))}
-          {busy && <div className="text-xs" style={{ color: "var(--color-text-secondary)" }}>typing…</div>}
+          {busy && (
+            <div className="flex items-center gap-2">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold" style={{ background: "var(--color-primary)", color: "var(--color-on-primary)" }}>AI</span>
+              <div className="rounded-2xl px-3.5 py-2.5" style={{ background: "var(--color-muted-bg)" }}>
+                <span className="typing-dots" aria-label="typing"><i></i><i></i><i></i></span>
+              </div>
+            </div>
+          )}
           <div ref={endRef} />
         </div>
       </div>
@@ -76,7 +89,7 @@ export function ReceptionChat() {
           aria-label="Message"
           disabled={busy}
         />
-        <button type="submit" disabled={busy || !input.trim()} className="themed rounded-md px-4 py-2 text-sm font-semibold btn-primary">
+        <button type="submit" disabled={busy || !input.trim()} className="themed rounded-full px-4 py-2 text-sm font-semibold btn-primary">
           Send
         </button>
       </form>

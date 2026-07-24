@@ -19,10 +19,10 @@ export default async function CasesPage({ searchParams }: { searchParams: { type
         Cases <span className="text-sm font-normal" style={{ color: "var(--color-text-secondary)" }}>({cases.length})</span>
       </PageTitle>
 
-      <div className="mb-4 flex flex-wrap gap-2 text-sm">
-        <Link href="/cases" className={`nav-link themed !py-1 ${!type ? "active" : ""}`}>All</Link>
+      <div className="mb-4 flex flex-wrap gap-2">
+        <Link href="/cases" className={`chip themed ${!type ? "active" : ""}`}>All</Link>
         {types.map((t) => (
-          <Link key={t} href={`/cases?type=${t}`} className={`nav-link themed !py-1 capitalize ${type === t ? "active" : ""}`}>{t}</Link>
+          <Link key={t} href={`/cases?type=${t}`} className={`chip themed capitalize ${type === t ? "active" : ""}`}>{t}</Link>
         ))}
       </div>
 
