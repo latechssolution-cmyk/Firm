@@ -63,9 +63,10 @@ export function Badge({ tone, children }: { tone: "success" | "warning" | "dange
   const color = tone === "neutral" ? "var(--color-text-secondary)" : `var(--color-${tone})`;
   return (
     <span
-      className="inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide"
+      className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide"
       style={{ color, background: `color-mix(in srgb, ${color} 12%, transparent)`, border: `1px solid color-mix(in srgb, ${color} 35%, transparent)` }}
     >
+      <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: color }} aria-hidden />
       {children}
     </span>
   );
@@ -101,7 +102,7 @@ export function PageTitle({ children, right }: { children: ReactNode; right?: Re
 export function Empty({ children, icon }: { children: ReactNode; icon?: ReactNode }) {
   return (
     <div className="flex flex-col items-center gap-2.5 py-10 text-center text-sm" style={{ color: "var(--color-text-secondary)" }}>
-      <span className="flex h-11 w-11 items-center justify-center rounded-full"
+      <span className="empty-float flex h-11 w-11 items-center justify-center rounded-full"
         style={{ background: "var(--color-muted-bg)", color: "var(--color-text-secondary)" }}>
         {icon ?? <span className="text-lg">·</span>}
       </span>

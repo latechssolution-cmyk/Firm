@@ -6,7 +6,7 @@ import { IconInquiries } from "@/components/icons";
 export default async function ReceptionPage() {
   const db = await getDB();
   return (
-    <main className="animate-in mx-auto max-w-lg p-4 md:p-8">
+    <main className="ambient-emerald animate-in mx-auto max-w-lg p-4 md:p-8">
       <div className="mb-4 flex items-center justify-between gap-2">
         <div className="flex items-center gap-3">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"

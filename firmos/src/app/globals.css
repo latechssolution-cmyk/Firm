@@ -198,6 +198,28 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
   .title-accent { transform-origin: left center; animation: bar-grow 620ms cubic-bezier(0.22, 1, 0.36, 1) both; }
 }
 
+/* Ambient emerald glow backdrop for full-screen entry pages (login, reception). */
+.ambient-emerald::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(48% 40% at 85% 6%, color-mix(in srgb, var(--color-primary) 13%, transparent), transparent 70%),
+    radial-gradient(46% 42% at 8% 94%, color-mix(in srgb, var(--color-accent-surface) 12%, transparent), transparent 72%);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ambient-emerald::before { animation: ambient-drift 14s ease-in-out infinite alternate; }
+  @keyframes ambient-drift { from { opacity: 0.75; transform: translateY(-1%); } to { opacity: 1; transform: translateY(1%); } }
+}
+
+/* Staggered list beyond 6 items (login role cards, etc.). */
+@media (prefers-reduced-motion: no-preference) {
+  .stagger > *:nth-child(7) { animation-delay: 340ms; }
+  .stagger > *:nth-child(8) { animation-delay: 390ms; }
+
+  /* Empty-state icon drifts gently — a calm "nothing here" cue. */
+  .empty-float { animation: empty-float 3.6s ease-in-out infinite; }
+  @keyframes empty-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+}
+
 /* Shimmer skeleton for loading states. */
 .skeleton {
   position: relative; overflow: hidden; border-radius: 8px;
