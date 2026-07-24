@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createClient, updateClient, deleteClient } from "@/lib/actions";
 import { Button } from "@/components/ui";
 import { DeleteButton } from "@/components/DeleteButton";
@@ -9,6 +9,14 @@ type Client = { id: string; name: string; cnic?: string; phone: string; address?
 
 export function ClientsManager({ clients }: { clients: Client[] }) {
   const [editing, setEditing] = useState<Client | "new" | null>(null);
+
+  // Close the modal once the server action returns fresh data (add/edit/delete).
+  const sig = clients.map((c) => `${c.id}:${c.name}:${c.phone}:${c.languagePref}`).join("|");
+  const firstRun = useRef(true);
+  useEffect(() => {
+    if (firstRun.current) { firstRun.current = false; return; }
+    setEditing(null);
+  }, [sig]);
 
   return (
     <div>
