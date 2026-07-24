@@ -6,7 +6,9 @@ import { recordHearing, deleteCase, deleteHearing, addFeeEntry, deleteFeeEntry }
 import { Card, PageTitle, Badge, Button, toneForDocStatus, rupees, Empty } from "@/components/ui";
 import { SubmitButton } from "@/components/SubmitButton";
 import { CaseSummary } from "@/components/CaseSummary";
+import { ScanUpload } from "@/components/ScanUpload";
 import { DeleteButton } from "@/components/DeleteButton";
+import { supabaseConfigured } from "@/lib/db";
 import { IconClock, IconSparkle } from "@/components/icons";
 import { caseDeadlines, caseAgeDays, nextHearing, isStale, suggestNextStage, stageFlow } from "@/lib/insights";
 
@@ -154,10 +156,18 @@ export default async function CaseDetail({ params }: { params: { id: string } })
             <div className="flex flex-col gap-2">
               {docs.map((d) => (
                 <Link key={d.id} href={`/documents/${d.id}`} className="flex items-center justify-between gap-2 text-sm no-underline" style={{ color: "var(--color-text-primary)" }}>
-                  <span className="truncate underline">{d.title}</span>
+                  <span className="min-w-0 flex-1 truncate">
+                    <span className="underline">{d.title}</span>
+                    {d.kind === "uploaded" && <span className="ml-1.5 text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                      {d.ocrStatus === "done" ? "· OCR ✓" : d.ocrStatus === "pending" ? "· OCR…" : d.ocrStatus === "failed" ? "· scan" : "· file"}
+                    </span>}
+                  </span>
                   <Badge tone={toneForDocStatus(d.status)}>{d.status}</Badge>
                 </Link>
               ))}
+            </div>
+            <div className="mt-3 border-t pt-3" style={{ borderColor: "var(--color-border-subtle)" }}>
+              <ScanUpload caseId={kase.id} configured={supabaseConfigured()} />
             </div>
           </Card>
 

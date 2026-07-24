@@ -21,8 +21,9 @@ export async function GET(req: NextRequest) {
     if (hits.length > 12) break;
   }
   for (const d of db.documents) {
-    if (`${d.title} ${d.body ?? ""}`.toLowerCase().includes(q))
-      hits.push({ href: `/documents/${d.id}`, title: d.title, sub: d.status, kind: "Document" });
+    // Includes OCR-extracted text so uploaded scans are full-text searchable.
+    if (`${d.title} ${d.body ?? ""} ${d.ocrText ?? ""}`.toLowerCase().includes(q))
+      hits.push({ href: `/documents/${d.id}`, title: d.title, sub: d.ocrText && d.body === undefined ? "scan · OCR" : d.status, kind: "Document" });
     if (hits.length > 15) break;
   }
   return NextResponse.json(hits.slice(0, 15));

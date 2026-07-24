@@ -74,6 +74,11 @@ export interface CaseDocument {
   status: DocStatus;
   visibility: "firm" | "shared";
   body?: string; // generated content
+  fileRef?: string; // Supabase Storage path for uploaded scans
+  fileType?: string; // mime type of the uploaded file
+  ocrText?: string; // extracted text (makes the scan full-text searchable)
+  ocrStatus?: "pending" | "done" | "failed" | "none";
+  ocrJobId?: string; // the worker job that processes this scan
   createdBy: string;
   createdAt: string;
 }
