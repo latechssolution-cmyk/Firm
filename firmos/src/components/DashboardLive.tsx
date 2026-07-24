@@ -26,6 +26,10 @@ export function DashboardLive({ initial }: { initial: DashboardData }) {
   const [range, setRange] = useState<"today" | "tomorrow" | "week">("tomorrow");
   const [, setTick] = useState(0); // re-render for the "updated Xs ago" label
   const [refreshing, setRefreshing] = useState(false);
+  // Time-of-day greeting and the relative timestamp depend on the client clock/timezone.
+  // Compute them only after mount so the server HTML and first client render match
+  // (otherwise the UTC-vs-local hour flips the greeting and warns on hydration).
+  const [mounted, setMounted] = useState(false);
 
   async function refresh() {
     try {
@@ -37,6 +41,7 @@ export function DashboardLive({ initial }: { initial: DashboardData }) {
   }
 
   useEffect(() => {
+    setMounted(true);
     const poll = setInterval(refresh, REFRESH_MS);
     const clock = setInterval(() => setTick((t) => t + 1), 1000);
     const onFocus = () => refresh();
@@ -60,10 +65,9 @@ export function DashboardLive({ initial }: { initial: DashboardData }) {
           <div className="mt-1 flex flex-wrap items-center gap-2 text-xs" style={{ color: "var(--color-text-secondary)" }}>
             <span className="flex items-center gap-1.5">
               <span className={refreshing ? "h-2 w-2 rounded-full" : "live-dot h-2 w-2 rounded-full"} style={{ background: "var(--color-success)" }} />
-              Live · updated {relTime(data.at)}
+              Live{mounted ? ` · updated ${relTime(data.at)}` : ""}
             </span>
-            <span aria-hidden>·</span>
-            <span>{greeting}, {firstName}</span>
+            {mounted && <><span aria-hidden>·</span><span>{greeting}, {firstName}</span></>}
           </div>
         </div>
         <GlobalSearch />
@@ -76,7 +80,7 @@ export function DashboardLive({ initial }: { initial: DashboardData }) {
         {data.canSeeFees
           ? <Stat label="Fees pending" value={<CountUp value={s.feesPending} format={(n) => rupees(n)} />} sub={`${s.collectionRate}% collected`} tone="warning" icon={<IconFees size={18} />} />
           : <Stat label="Documents" value={<CountUp value={s.documents} />} sub="On file" icon={<IconDocs size={18} />} />}
-        <Stat label="Missed dates" value={<CountUp value={s.missedDates} />} sub="Always" tone={s.missedDates === 0 ? "success" : "danger"} icon={<IconCheck size={18} />} />
+        <Stat label="Missed dates" value={<CountUp value={s.missedDates} />} sub={s.missedDates === 0 ? "All dates logged" : "Past dates unlogged"} tone={s.missedDates === 0 ? "success" : "danger"} icon={<IconCheck size={18} />} />
       </div>
 
       {/* Attention + court donut */}

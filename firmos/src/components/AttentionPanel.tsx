@@ -13,7 +13,7 @@ export function AttentionPanel({ items }: { items: AttentionItem[] }) {
     <Card>
       <div className="mb-3 flex items-center justify-between gap-2">
         <h2 className="flex items-center gap-2 font-bold">
-          <IconClock size={18} /> Needs Attention Today
+          <IconClock size={18} /> Needs Attention
         </h2>
         <span className="text-xs font-semibold" style={{ color: highCount ? "var(--color-danger)" : "var(--color-text-secondary)" }}>
           {items.length === 0 ? "All clear" : `${highCount} urgent · ${items.length} total`}

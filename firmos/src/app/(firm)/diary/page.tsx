@@ -52,7 +52,8 @@ export default async function DiaryPage() {
             <h2 className="mb-3 font-bold">{label(date)} <span className="text-xs font-normal" style={{ color: "var(--color-text-secondary)" }}>· {hs.length} {hs.length === 1 ? "hearing" : "hearings"}</span></h2>
             <div className="flex flex-col gap-2">
               {hs.map((h) => {
-                const kase = db.cases.find((c) => c.id === h.caseId)!;
+                const kase = db.cases.find((c) => c.id === h.caseId);
+                if (!kase) return null; // orphaned hearing — never crash the whole diary
                 const court = db.courts.find((ct) => ct.id === kase.courtId);
                 return (
                   <div key={h.id} className="flex items-center justify-between gap-3 rounded-md border p-3" style={{ borderColor: "var(--color-border-subtle)" }}>

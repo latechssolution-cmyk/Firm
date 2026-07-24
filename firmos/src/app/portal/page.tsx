@@ -9,8 +9,9 @@ import Link from "next/link";
 export default async function PortalPage() {
   const user = await requireUser(["client"]);
   const db = await getDB();
-  // RBAC scoping: a client sees ONLY their own cases (PRD CP-1).
-  const myCases = db.cases.filter((c) => c.clientId === user.clientId);
+  // RBAC scoping: a client sees ONLY their own cases (PRD CP-1). Guard against a
+  // missing clientId so an undefined never matches cases that also lack one.
+  const myCases = user.clientId ? db.cases.filter((c) => c.clientId === user.clientId) : [];
 
   return (
     <main className="animate-in mx-auto max-w-3xl p-4 md:p-6">

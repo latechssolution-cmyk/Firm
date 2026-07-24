@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDB } from "@/lib/db";
 import { requireUser, canSeeFees } from "@/lib/auth";
-import { recordHearing, deleteCase, deleteHearing, addFeeEntry, deleteFeeEntry } from "@/lib/actions";
+import { recordHearing, deleteCase, deleteHearing, updateHearing, addFeeEntry, deleteFeeEntry } from "@/lib/actions";
 import { Card, PageTitle, Badge, Button, toneForDocStatus, rupees, Empty } from "@/components/ui";
 import { SubmitButton } from "@/components/SubmitButton";
 import { CaseSummary } from "@/components/CaseSummary";
@@ -77,6 +77,16 @@ export default async function CaseDetail({ params }: { params: { id: string } })
                     <span className="font-semibold">{h.date}{h.time ? ` · ${h.time}` : ""} — {h.purpose}</span>
                     <div className="flex items-center gap-2">
                       {!h.outcomeNote && <Badge tone={h.readiness === "ready" ? "success" : "warning"}>{h.readiness === "ready" ? "File ready" : "Upcoming"}</Badge>}
+                      {!h.outcomeNote && (
+                        <form action={updateHearing}>
+                          <input type="hidden" name="id" value={h.id} />
+                          <input type="hidden" name="time" value={h.time ?? ""} />
+                          <input type="hidden" name="readiness" value={h.readiness === "ready" ? "pending" : "ready"} />
+                          <button type="submit" className="themed btn-secondary rounded-md px-2 py-1 text-xs font-semibold">
+                            {h.readiness === "ready" ? "Mark upcoming" : "Mark file-ready"}
+                          </button>
+                        </form>
+                      )}
                       <DeleteButton id={h.id} action={deleteHearing} label="✕" small confirm="Delete this hearing entry?" />
                     </div>
                   </div>

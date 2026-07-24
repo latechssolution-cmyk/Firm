@@ -5,13 +5,14 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { getDB, persist, uid, audit, enqueueNotification, resetDemo, resyncAll } from "./db";
 import { SESSION_COOKIE, requireUser } from "./auth";
+import { stageFlow } from "./insights";
 
 export async function login(formData: FormData) {
   const userId = String(formData.get("userId") ?? "");
   const db = await getDB();
   const user = db.users.find((u) => u.id === userId);
   if (!user) redirect("/login");
-  cookies().set(SESSION_COOKIE, user.id, { httpOnly: true, sameSite: "lax", path: "/" });
+  cookies().set(SESSION_COOKIE, user.id, { httpOnly: true, sameSite: "lax", path: "/", secure: process.env.NODE_ENV === "production" });
   await audit({ userId: user.id, userName: user.name, action: "login", entityType: "session", entityId: "-" });
   redirect(user.role === "client" ? "/portal" : "/dashboard");
 }
@@ -27,7 +28,7 @@ export async function recordHearing(formData: FormData) {
   const caseId = String(formData.get("caseId"));
   const outcome = String(formData.get("outcome") ?? "").trim();
   const nextDate = String(formData.get("nextDate") ?? "");
-  const purpose = String(formData.get("purpose") ?? "Hearing");
+  const purpose = String(formData.get("purpose") || "").trim() || "Hearing";
   const db = await getDB();
   const kase = db.cases.find((c) => c.id === caseId);
   if (!kase || !outcome) return;
@@ -75,7 +76,7 @@ export async function createCase(formData: FormData) {
     number: String(formData.get("number")),
     type,
     courtId: String(formData.get("courtId")),
-    stage: String(formData.get("stage") || "Instituted"),
+    stage: String(formData.get("stage") || stageFlow(type)[0] || "Instituted"),
     title: String(formData.get("title")),
     parties: { plaintiff: String(formData.get("plaintiff")), defendant: String(formData.get("defendant")) },
     clientId: String(formData.get("clientId")),
@@ -363,10 +364,11 @@ export async function updateHearing(formData: FormData) {
   h.purpose = String(formData.get("purpose") || h.purpose);
   h.outcomeNote = String(formData.get("outcomeNote") || "") || undefined;
   h.readiness = String(formData.get("readiness") || h.readiness) as typeof h.readiness;
-  await audit({ userId: user.id, userName: user.name, action: "edit", entityType: "hearing", entityId: h.caseId, detail: `Hearing ${h.date} edited` });
+  await audit({ userId: user.id, userName: user.name, action: "edit", entityType: "hearing", entityId: h.caseId, detail: `Hearing ${h.date} updated (readiness=${h.readiness})` });
   await persist();
   revalidatePath(`/cases/${h.caseId}`);
   revalidatePath("/diary");
+  revalidatePath("/dashboard");
 }
 
 export async function deleteHearing(formData: FormData) {
@@ -463,6 +465,7 @@ export async function deleteInquiry(formData: FormData) {
   db.audit.unshift({ id: uid("a"), userId: user.id, userName: user.name, action: "edit", entityType: "inquiry", entityId: q.callerName, detail: "Inquiry deleted", at: new Date().toISOString() });
   await resyncAll();
   revalidatePath("/inquiries");
+  redirect(`/inquiries?toast=${encodeURIComponent(`Deleted inquiry from ${q.callerName}`)}`);
 }
 
 export async function resetDemoData() {

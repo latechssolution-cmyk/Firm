@@ -10,7 +10,7 @@ import { WorkerRender } from "@/components/WorkerRender";
 import { supabaseConfigured, signedScanUrl } from "@/lib/db";
 
 export default async function DocumentDetail({ params }: { params: { id: string } }) {
-  await requireUser(["admin", "associate", "clerk"]);
+  const user = await requireUser(["admin", "associate", "clerk"]);
   const db = await getDB();
   const doc = db.documents.find((d) => d.id === params.id);
   if (!doc) notFound();
@@ -67,7 +67,7 @@ export default async function DocumentDetail({ params }: { params: { id: string 
           </select>
           <Button kind="primary">Update</Button>
         </form>
-        <div className="ml-auto"><DeleteButton id={doc.id} action={deleteDocument} confirm={`Delete "${doc.title}"?`} /></div>
+        {user.role !== "clerk" && <div className="ml-auto"><DeleteButton id={doc.id} action={deleteDocument} confirm={`Delete "${doc.title}"?`} /></div>}
       </div>
 
       {doc.body && (

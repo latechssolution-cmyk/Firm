@@ -9,7 +9,9 @@ export default async function ClientsPage() {
   const clients = db.clients.map((cl) => ({
     id: cl.id, name: cl.name, cnic: cl.cnic, phone: cl.phone, address: cl.address,
     languagePref: cl.languagePref,
-    caseCount: db.cases.filter((c) => c.clientId === cl.id && c.status === "active").length,
+    // Count ALL cases (any status): delete is blocked whenever a client has any
+    // case, so the number shown must reflect exactly what blocks deletion.
+    caseCount: db.cases.filter((c) => c.clientId === cl.id).length,
   }));
   return (
     <div>

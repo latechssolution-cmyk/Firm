@@ -10,6 +10,14 @@ export default async function GeneratePage({ searchParams }: { searchParams: { t
   const db = await getDB();
   const template = TEMPLATES.find((t) => t.id === searchParams.template) ?? TEMPLATES[0];
   const kase = db.cases.find((c) => c.id === searchParams.caseId) ?? db.cases[0];
+  if (!kase) {
+    return (
+      <div className="max-w-3xl">
+        <PageTitle>Generate Document</PageTitle>
+        <Card><p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>No cases on file yet. Create a case first, then generate documents for it.</p></Card>
+      </div>
+    );
+  }
   const client = db.clients.find((cl) => cl.id === kase.clientId);
   const court = db.courts.find((ct) => ct.id === kase.courtId);
   const body = template.render(kase, client, court, db.firm.name);

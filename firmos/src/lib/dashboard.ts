@@ -60,7 +60,9 @@ export function buildDashboard(db: DB, user: User): DashboardData {
 
   const active = db.cases.filter((c) => c.status === "active");
   const fa = feeAnalytics(db);
-  const missed = db.hearings.filter((h) => h.date < today && h.readiness === "pending" && !h.outcomeNote).length;
+  // A past hearing with no recorded outcome is a missed/unlogged date — regardless
+  // of how prepared it was (a "ready" hearing that slipped by unlogged still counts).
+  const missed = db.hearings.filter((h) => h.date < today && !h.outcomeNote).length;
   const attention = attentionItems(db).filter((i) => canSeeFees(user) || i.kind !== "fee");
 
   const byCourtCount: Record<string, number> = {};

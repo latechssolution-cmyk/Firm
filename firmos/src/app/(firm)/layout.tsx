@@ -38,7 +38,7 @@ export default async function FirmLayout({ children }: { children: React.ReactNo
   return (
     <div className="flex min-h-screen">
       <aside
-        className="hidden w-60 shrink-0 flex-col gap-1 border-r p-4 md:flex"
+        className="hidden w-60 shrink-0 flex-col gap-1 border-r p-4 md:flex md:sticky md:top-0 md:h-screen md:overflow-y-auto"
         style={{ background: "var(--color-surface)", borderColor: "var(--color-border-subtle)", boxShadow: "var(--shadow-sm)" }}
       >
         <div className="mb-5 flex items-center gap-2.5">

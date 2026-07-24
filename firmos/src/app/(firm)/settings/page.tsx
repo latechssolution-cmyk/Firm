@@ -6,9 +6,12 @@ import { PageTitle, Card, Badge, Button } from "@/components/ui";
 export default async function SettingsPage() {
   await requireUser(["admin"]);
   const db = await getDB();
+  // "on" only when the FULL credential set a channel actually needs is present —
+  // matching notify-adapters (WhatsApp needs token + phone id; SMS needs key + url),
+  // so a badge never claims "on" while messages still record "no gateway configured".
   const integrations = [
-    { name: "SMS gateway (branded mask)", env: "SMS_GATEWAY_KEY", configured: !!process.env.SMS_GATEWAY_KEY },
-    { name: "WhatsApp Business Cloud API", env: "WHATSAPP_TOKEN", configured: !!process.env.WHATSAPP_TOKEN },
+    { name: "SMS gateway (branded mask)", env: "SMS_GATEWAY_KEY + SMS_GATEWAY_URL", configured: !!(process.env.SMS_GATEWAY_KEY && process.env.SMS_GATEWAY_URL) },
+    { name: "WhatsApp Business Cloud API", env: "WHATSAPP_TOKEN + WHATSAPP_PHONE_ID", configured: !!(process.env.WHATSAPP_TOKEN && process.env.WHATSAPP_PHONE_ID) },
     { name: "Payment gateway (PayFast/Kuickpay)", env: "PAYMENT_GATEWAY_KEY", configured: !!process.env.PAYMENT_GATEWAY_KEY },
     { name: "Claude API (AI receptionist LLM)", env: "ANTHROPIC_API_KEY", configured: !!process.env.ANTHROPIC_API_KEY },
     { name: "Supabase (production data layer)", env: "SUPABASE_URL", configured: !!process.env.SUPABASE_URL },
