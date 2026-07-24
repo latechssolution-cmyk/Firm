@@ -3,8 +3,9 @@ import Link from "next/link";
 import { getDB } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { updateCase } from "@/lib/actions";
-import { Card, PageTitle, Button } from "@/components/ui";
+import { Card, PageTitle } from "@/components/ui";
 import { Field } from "@/components/Field";
+import { SubmitButton } from "@/components/SubmitButton";
 
 export default async function EditCasePage({ params }: { params: { id: string } }) {
   await requireUser(["admin", "associate", "clerk"]);
@@ -68,7 +69,7 @@ export default async function EditCasePage({ params }: { params: { id: string } 
           <Field label="Limitation / deadline date">
             <input type="date" name="limitationDate" defaultValue={kase.limitationDate ?? ""} />
           </Field>
-          <div className="md:col-span-2"><Button kind="primary">Save changes</Button></div>
+          <div className="md:col-span-2"><SubmitButton>Save changes</SubmitButton></div>
         </form>
       </Card>
     </div>

@@ -2,8 +2,9 @@ import Link from "next/link";
 import { getDB } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { createCase } from "@/lib/actions";
-import { Card, PageTitle, Button } from "@/components/ui";
+import { Card, PageTitle } from "@/components/ui";
 import { Field } from "@/components/Field";
+import { SubmitButton } from "@/components/SubmitButton";
 import { ConflictCheck } from "@/components/ConflictCheck";
 
 export default async function NewCasePage() {
@@ -57,7 +58,7 @@ export default async function NewCasePage() {
             <input name="sections" placeholder="e.g. 302/34 PPC" />
           </Field>
           <ConflictCheck />
-          <div className="md:col-span-2"><Button kind="primary">Create case</Button></div>
+          <div className="md:col-span-2"><SubmitButton>Create case</SubmitButton></div>
         </form>
       </Card>
     </div>

@@ -30,7 +30,7 @@ export function Card({ children, elevated = false, hover = false, className = ""
 export function Stat({ label, value, sub, tone, icon, featured = false }: { label: string; value: ReactNode; sub?: string; tone?: "success" | "warning" | "danger" | "info"; icon?: ReactNode; featured?: boolean }) {
   if (featured) {
     return (
-      <div className="themed card card-hover rounded-2xl p-5" style={{ background: "var(--color-accent-surface)", color: "var(--color-on-accent)", border: "1px solid transparent", boxShadow: "var(--shadow-md)" }}>
+      <div className="themed card card-hover accent-gradient rounded-2xl p-5" style={{ color: "var(--color-on-accent)", border: "1px solid transparent", boxShadow: "var(--shadow-md)" }}>
         <div className="flex items-center justify-between gap-2">
           <div className="text-[11px] font-semibold uppercase tracking-[0.08em]" style={{ opacity: 0.85 }}>{label}</div>
           {icon && (

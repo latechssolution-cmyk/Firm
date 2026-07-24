@@ -7,6 +7,7 @@ import { AttentionPanel } from "@/components/AttentionPanel";
 import { GlobalSearch } from "@/components/GlobalSearch";
 import { CountUp } from "@/components/CountUp";
 import { Donut } from "@/components/Donut";
+import { Reveal } from "@/components/Reveal";
 import { IconCases, IconDiary, IconFees, IconCheck, IconDocs } from "@/components/icons";
 import type { DashboardData } from "@/lib/dashboard";
 
@@ -100,7 +101,7 @@ export function DashboardLive({ initial }: { initial: DashboardData }) {
       </div>
 
       {/* Cause list with a live range toggle */}
-      <div className="mt-4">
+      <Reveal className="mt-4">
         <Card>
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <h2 className="flex items-center gap-2 font-bold"><IconDiary size={18} /> Cause List</h2>
@@ -133,7 +134,7 @@ export function DashboardLive({ initial }: { initial: DashboardData }) {
             ))}
           </div>
         </Card>
-      </div>
+      </Reveal>
     </div>
   );
 }
