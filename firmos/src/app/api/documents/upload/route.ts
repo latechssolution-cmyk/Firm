@@ -29,21 +29,23 @@ export async function POST(req: NextRequest) {
   const stored = await uploadScan(path, await file.arrayBuffer(), file.type || "application/octet-stream");
   if (!stored) return NextResponse.json({ error: "storage not configured or upload failed" }, { status: 503 });
 
+  // OCR runs on images (Tesseract) and PDFs (rasterised page-by-page on the worker).
   const isImage = /^image\//.test(file.type);
+  const isPdf = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
+  const ocrable = isImage || isPdf;
   const docId = uid("d");
-  // OCR runs on images (Tesseract). PDFs/others are stored & searchable by title only.
-  const jobId = isImage ? await enqueueJob("ocr", { bucket: STORAGE_BUCKET_NAME, filePath: path, docId }) : null;
+  const jobId = ocrable ? await enqueueJob("ocr", { bucket: STORAGE_BUCKET_NAME, filePath: path, docId }) : null;
 
   const doc: CaseDocument = {
     id: docId, caseId, kind: "uploaded", title: title || file.name,
     status: "filed", visibility: "firm",
     fileRef: path, fileType: file.type,
-    ocrStatus: isImage ? "pending" : "none", ocrJobId: jobId ?? undefined,
+    ocrStatus: ocrable ? "pending" : "none", ocrJobId: jobId ?? undefined,
     createdBy: user.id, createdAt: new Date().toISOString(),
   };
   db.documents.unshift(doc);
-  await audit({ userId: user.id, userName: user.name, action: "create", entityType: "document", entityId: doc.title, detail: isImage ? "Scan uploaded — OCR queued" : "File uploaded" });
+  await audit({ userId: user.id, userName: user.name, action: "create", entityType: "document", entityId: doc.title, detail: ocrable ? "Scan uploaded — OCR queued" : "File uploaded" });
   await persist();
 
-  return NextResponse.json({ docId, jobId, ocr: isImage });
+  return NextResponse.json({ docId, jobId, ocr: ocrable });
 }

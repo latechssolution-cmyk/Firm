@@ -48,16 +48,50 @@ async function storageDownload(bucket, filePath) {
 
 async function has(bin, args = ["--version"]) { try { await exec(bin, args); return true; } catch { return false; } }
 
+// OCR one image file with Tesseract (eng+urd) → text.
+async function ocrImage(imgPath) {
+  const out = `${imgPath}.out`;
+  await exec("tesseract", [imgPath, out, "-l", "eng+urd"]);
+  const text = (await fs.readFile(`${out}.txt`, "utf-8")).trim();
+  await fs.rm(`${out}.txt`, { force: true });
+  return text;
+}
+
+const MAX_PDF_PAGES = 20;
+
 async function runOcr(payload) {
   const { bucket, filePath } = payload;
   const buf = await storageDownload(bucket, filePath);
+  const ext = (path.extname(filePath) || ".png").toLowerCase();
   const tmp = path.join(os.tmpdir(), `ocr-${Date.now()}`);
-  const inFile = `${tmp}${path.extname(filePath) || ".png"}`;
+
+  // PDF: rasterise each page (pdftoppm) then OCR every page, concatenate.
+  if (ext === ".pdf") {
+    const pdfPath = `${tmp}.pdf`;
+    await fs.writeFile(pdfPath, buf);
+    const prefix = `${tmp}-p`;
+    await exec("pdftoppm", ["-png", "-r", "200", "-l", String(MAX_PDF_PAGES), pdfPath, prefix]);
+    const dir = os.tmpdir();
+    const pages = (await fs.readdir(dir))
+      .filter((f) => f.startsWith(path.basename(prefix)) && f.endsWith(".png"))
+      .sort();
+    let text = "";
+    for (const p of pages) {
+      const full = path.join(dir, p);
+      text += (await ocrImage(full)).trim() + "\n\n";
+      await fs.rm(full, { force: true });
+    }
+    await fs.rm(pdfPath, { force: true });
+    text = text.trim();
+    return { text, chars: text.length, pages: pages.length };
+  }
+
+  // Image: OCR directly.
+  const inFile = `${tmp}${ext}`;
   await fs.writeFile(inFile, buf);
-  await exec("tesseract", [inFile, tmp, "-l", "eng+urd"]);
-  const text = (await fs.readFile(`${tmp}.txt`, "utf-8")).trim();
-  await fs.rm(inFile, { force: true }); await fs.rm(`${tmp}.txt`, { force: true });
-  return { text, chars: text.length };
+  const text = await ocrImage(inFile);
+  await fs.rm(inFile, { force: true });
+  return { text, chars: text.length, pages: 1 };
 }
 async function runPdf(payload) {
   const tmp = path.join(os.tmpdir(), `pdf-${Date.now()}`);
@@ -93,7 +127,7 @@ async function tick() {
 
 async function main() {
   console.log(`FirmOS worker ${WORKER_ID} · kinds=[${KINDS}] · poll=${POLL_MS}ms`);
-  console.log(`  tesseract: ${(await has("tesseract")) ? "yes" : "MISSING"} · libreoffice: ${(await has("libreoffice")) ? "yes" : "MISSING"}`);
+  console.log(`  tesseract: ${(await has("tesseract")) ? "yes" : "MISSING"} · pdftoppm: ${(await has("pdftoppm", ["-h"])) ? "yes" : "MISSING"} · libreoffice: ${(await has("libreoffice")) ? "yes" : "MISSING"}`);
   for (;;) {
     let worked = false;
     try { worked = await tick(); } catch (e) { console.error("tick error:", e?.message ?? e); }

@@ -59,7 +59,7 @@ export function ScanUpload({ caseId, configured }: { caseId: string; configured:
         <input ref={inputRef} type="file" accept="image/*,application/pdf" className="hidden" onChange={onFile} disabled={busy} />
       </label>
       {phase !== "idle" && <span className="text-xs" style={{ color: tone }}>{msg}</span>}
-      <span className="text-[11px]" style={{ color: "var(--color-text-secondary)" }}>Images are read with OCR (English + Urdu) and made searchable.</span>
+      <span className="text-[11px]" style={{ color: "var(--color-text-secondary)" }}>Images &amp; PDFs are read with OCR (English + Urdu) and made searchable.</span>
     </div>
   );
 }

@@ -6,7 +6,7 @@ set -euo pipefail
 echo "== FirmOS worker setup =="
 sudo apt-get update -y
 # Node 20, OCR (English + Urdu), headless LibreOffice for PDF
-sudo apt-get install -y ca-certificates curl gnupg tesseract-ocr tesseract-ocr-urd libreoffice --no-install-recommends
+sudo apt-get install -y ca-certificates curl gnupg tesseract-ocr tesseract-ocr-urd poppler-utils libreoffice --no-install-recommends
 if ! command -v node >/dev/null; then
   curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
   sudo apt-get install -y nodejs
