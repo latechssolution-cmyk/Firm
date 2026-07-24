@@ -3,6 +3,7 @@ import { getDB } from "@/lib/db";
 import { currentUser } from "@/lib/auth";
 import { caseDeadlines, caseBalance, nextHearing } from "@/lib/insights";
 import { geminiGenerate } from "@/lib/ai";
+import { resolveIntegrations } from "@/lib/settings";
 
 /**
  * AI case summary. Builds a factual brief of the case from its records; when
@@ -37,10 +38,13 @@ export async function POST(req: NextRequest) {
     `Hearing history (${held.length}): ${held.map((h) => `${h.date} — ${h.outcomeNote}`).join(" | ") || "none recorded"}`,
   ].filter(Boolean).join("\n");
 
+  const ai = resolveIntegrations(db);
   const aiSummary = await geminiGenerate({
     system: "You are a legal associate at a Pakistani law firm. Given case facts, write a crisp 3-4 sentence status summary followed by 2-3 concrete next steps as a bullet list. Be practical and specific to Pakistani court practice. Do not invent facts not present.",
     user: facts,
     maxTokens: 600,
+    apiKey: ai.geminiApiKey,
+    model: ai.geminiModel,
   });
   if (aiSummary) return NextResponse.json({ summary: aiSummary, ai: true });
 

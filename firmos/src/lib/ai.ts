@@ -8,30 +8,33 @@
  * so the token budget goes to the actual reply, not hidden reasoning.
  */
 
-const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+const DEFAULT_MODEL = "gemini-2.5-flash";
 const GEMINI_ENDPOINT = (model: string) =>
   `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
-
-export const aiConfigured = () => !!process.env.GEMINI_API_KEY;
 
 type Turn = { role: "user" | "model"; text: string };
 
 /** Generate text with Gemini. Returns the trimmed reply, or null if unconfigured
- *  or on any failure (caller then uses its deterministic fallback). */
+ *  or on any failure (caller then uses its deterministic fallback). The API key
+ *  and model are passed in (resolved from Settings-over-env), so config is dynamic;
+ *  they fall back to the environment variables when omitted. */
 export async function geminiGenerate(opts: {
   system: string;
   turns?: Turn[];
   user: string;
   maxTokens?: number;
+  apiKey?: string;
+  model?: string;
 }): Promise<string | null> {
-  const key = process.env.GEMINI_API_KEY;
+  const key = opts.apiKey ?? process.env.GEMINI_API_KEY;
+  const model = opts.model || process.env.GEMINI_MODEL || DEFAULT_MODEL;
   if (!key) return null;
   const contents = [
     ...(opts.turns ?? []).map((t) => ({ role: t.role, parts: [{ text: t.text }] })),
     { role: "user" as const, parts: [{ text: opts.user }] },
   ];
   try {
-    const r = await fetch(GEMINI_ENDPOINT(GEMINI_MODEL), {
+    const r = await fetch(GEMINI_ENDPOINT(model), {
       method: "POST",
       headers: { "content-type": "application/json", "x-goog-api-key": key },
       body: JSON.stringify({

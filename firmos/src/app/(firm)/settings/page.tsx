@@ -1,49 +1,86 @@
 import { getDB } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
-import { resetDemoData } from "@/lib/actions";
+import { resetDemoData, updateFirmProfile, updateIntegrations } from "@/lib/actions";
+import { integrationStatuses } from "@/lib/settings";
 import { PageTitle, Card, Badge, Button } from "@/components/ui";
+import { SubmitButton } from "@/components/SubmitButton";
 
 export default async function SettingsPage() {
   await requireUser(["admin"]);
   const db = await getDB();
-  // "on" only when the FULL credential set a channel actually needs is present —
-  // matching notify-adapters (WhatsApp needs token + phone id; SMS needs key + url),
-  // so a badge never claims "on" while messages still record "no gateway configured".
-  const integrations = [
-    { name: "SMS gateway (branded mask)", env: "SMS_GATEWAY_KEY + SMS_GATEWAY_URL", configured: !!(process.env.SMS_GATEWAY_KEY && process.env.SMS_GATEWAY_URL) },
-    { name: "WhatsApp Business Cloud API", env: "WHATSAPP_TOKEN + WHATSAPP_PHONE_ID", configured: !!(process.env.WHATSAPP_TOKEN && process.env.WHATSAPP_PHONE_ID) },
-    { name: "Payment gateway (PayFast/Kuickpay)", env: "PAYMENT_GATEWAY_KEY", configured: !!process.env.PAYMENT_GATEWAY_KEY },
-    { name: "Gemini API (AI receptionist LLM)", env: "GEMINI_API_KEY", configured: !!process.env.GEMINI_API_KEY },
-    { name: "Supabase (production data layer)", env: "SUPABASE_URL", configured: !!process.env.SUPABASE_URL },
-  ];
+  const statuses = integrationStatuses(db);
+  const saved = (db.firm.integrations ?? {}) as Record<string, string | undefined>;
+
   return (
     <div className="max-w-3xl">
       <PageTitle>Settings</PageTitle>
 
+      {/* Firm profile — editable */}
       <Card className="mb-4">
-        <h2 className="mb-2 font-bold">Firm branding</h2>
-        <div className="text-sm">{db.firm.name} · {db.firm.nameUrdu}</div>
-        <div className="text-xs" style={{ color: "var(--color-text-secondary)" }}>{db.firm.tagline}</div>
+        <h2 className="mb-1 font-bold">Firm profile</h2>
+        <p className="mb-3 text-xs" style={{ color: "var(--color-text-secondary)" }}>
+          Shown across the app — the sidebar, login, client portal, and generated documents.
+        </p>
+        <form action={updateFirmProfile} className="grid gap-3 sm:grid-cols-2">
+          <label className="text-sm">Firm name
+            <input name="name" defaultValue={db.firm.name} required className="mt-1" />
+          </label>
+          <label className="text-sm">Name (Urdu)
+            <input name="nameUrdu" defaultValue={db.firm.nameUrdu} dir="rtl" className="mt-1" />
+          </label>
+          <label className="text-sm sm:col-span-2">Tagline
+            <input name="tagline" defaultValue={db.firm.tagline} className="mt-1" />
+          </label>
+          <div className="sm:col-span-2"><SubmitButton>Save profile</SubmitButton></div>
+        </form>
       </Card>
 
+      {/* Integrations — editable, DB-backed, live status */}
       <Card className="mb-4">
-        <h2 className="mb-3 font-bold">Integrations</h2>
-        <div className="grid gap-2 sm:grid-cols-2">
-          {integrations.map((i) => (
-            <div key={i.env} className="flex items-center justify-between gap-2 rounded-xl border p-3" style={{ borderColor: "var(--color-border-subtle)" }}>
-              <span className="min-w-0">
-                <span className="block truncate text-sm font-semibold">{i.name}</span>
-                <code className="text-[11px]" style={{ color: "var(--color-text-secondary)" }}>{i.env}</code>
-              </span>
-              <Badge tone={i.configured ? "success" : "warning"}>{i.configured ? "on" : "off"}</Badge>
+        <h2 className="mb-1 font-bold">Integrations</h2>
+        <p className="mb-3 text-xs" style={{ color: "var(--color-text-secondary)" }}>
+          Saved here and applied live — no redeploy. A saved value overrides the matching environment variable.
+          Secrets are stored on your tenant and never shown again; leave a secret blank to keep it.
+        </p>
+        <form action={updateIntegrations} className="flex flex-col gap-3">
+          {statuses.map((s) => (
+            <div key={s.key} className="rounded-xl border p-3" style={{ borderColor: "var(--color-border-subtle)" }}>
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-sm font-semibold">{s.name}</span>
+                <Badge tone={s.on ? "success" : "warning"}>{s.on ? "on" : "off"}</Badge>
+              </div>
+              <div className="mt-0.5 text-xs" style={{ color: "var(--color-text-secondary)" }}>{s.detail}</div>
+              {s.fields.length > 0 && (
+                <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                  {s.fields.map((f) => (
+                    <div key={f.name} className="text-xs">
+                      <label className="block">
+                        {f.label}
+                        <input
+                          name={f.name}
+                          type={f.secret ? "password" : "text"}
+                          autoComplete="off"
+                          defaultValue={f.secret ? "" : (saved[f.name] ?? "")}
+                          placeholder={f.secret ? (f.set ? "•••• saved — leave blank to keep" : "not set") : ""}
+                          className="mt-1"
+                        />
+                      </label>
+                      {f.secret && f.set && (
+                        <label className="mt-1 flex items-center gap-1.5" style={{ color: "var(--color-text-secondary)" }}>
+                          <input type="checkbox" name={`clear_${f.name}`} className="!w-auto" /> remove saved key
+                        </label>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
-        </div>
-        <p className="mt-3 text-xs" style={{ color: "var(--color-text-secondary)" }}>
-          Set the environment variable and restart. Until a channel is configured, its notifications stay honestly &quot;queued&quot; — nothing is faked as sent.
-        </p>
+          <div><SubmitButton>Save integrations</SubmitButton></div>
+        </form>
       </Card>
 
+      {/* Notification queue */}
       <Card className="mb-4">
         <h2 className="mb-3 font-bold">Notification queue</h2>
         <div className="flex flex-col gap-2">
@@ -61,6 +98,7 @@ export default async function SettingsPage() {
         </div>
       </Card>
 
+      {/* Demo tenant */}
       <Card>
         <h2 className="mb-2 font-bold">Demo tenant</h2>
         <p className="mb-3 text-sm" style={{ color: "var(--color-text-secondary)" }}>

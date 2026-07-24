@@ -475,6 +475,50 @@ export async function resetDemoData() {
   redirect("/dashboard");
 }
 
+// ---- Settings: firm profile + integrations (admin) ----------------------
+
+export async function updateFirmProfile(formData: FormData) {
+  const user = await requireUser(["admin"]);
+  const db = await getDB();
+  db.firm.name = String(formData.get("name") || "").trim() || db.firm.name;
+  db.firm.nameUrdu = String(formData.get("nameUrdu") ?? db.firm.nameUrdu).trim();
+  db.firm.tagline = String(formData.get("tagline") ?? db.firm.tagline).trim();
+  await audit({ userId: user.id, userName: user.name, action: "edit", entityType: "settings", entityId: "firm-profile", detail: `Firm profile updated (${db.firm.name})` });
+  await persist();
+  revalidatePath("/settings");
+  revalidatePath("/dashboard");
+  redirect(`/settings?toast=${encodeURIComponent("Firm profile saved")}`);
+}
+
+export async function updateIntegrations(formData: FormData) {
+  const user = await requireUser(["admin"]);
+  const db = await getDB();
+  const cur = db.firm.integrations ?? {};
+  // Secrets: an explicit "clear_<name>" removes it; a new value replaces; blank keeps
+  // the existing value (secrets are never echoed back to the form). Non-secrets are
+  // prefilled, so blank genuinely clears them.
+  const secret = (name: string, prev?: string) => {
+    if (formData.get(`clear_${name}`)) return undefined;
+    const v = String(formData.get(name) ?? "").trim();
+    return v || prev;
+  };
+  const plain = (name: string) => String(formData.get(name) ?? "").trim() || undefined;
+  db.firm.integrations = {
+    geminiApiKey: secret("geminiApiKey", cur.geminiApiKey),
+    geminiModel: plain("geminiModel"),
+    whatsappToken: secret("whatsappToken", cur.whatsappToken),
+    whatsappPhoneId: plain("whatsappPhoneId"),
+    smsKey: secret("smsKey", cur.smsKey),
+    smsUrl: plain("smsUrl"),
+    smsSender: plain("smsSender"),
+    paymentKey: secret("paymentKey", cur.paymentKey),
+  };
+  await audit({ userId: user.id, userName: user.name, action: "edit", entityType: "settings", entityId: "integrations", detail: "Integration settings updated" });
+  await persist();
+  revalidatePath("/settings");
+  redirect(`/settings?toast=${encodeURIComponent("Integration settings saved")}`);
+}
+
 export async function logDocumentView(docId: string) {
   const db = await getDB();
   const user = await requireUser();

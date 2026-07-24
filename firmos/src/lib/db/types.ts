@@ -130,8 +130,30 @@ export interface AuditEvent {
   at: string;
 }
 
+/** Integration credentials/config, managed from Settings (persisted in the DB).
+ *  A saved value here takes precedence over the matching environment variable, so
+ *  the admin can turn a channel on/off live without a redeploy. Secrets are stored
+ *  as-is in the tenant's own row (service-role only); production would encrypt at rest. */
+export interface Integrations {
+  geminiApiKey?: string;
+  geminiModel?: string;
+  whatsappToken?: string;
+  whatsappPhoneId?: string;
+  smsKey?: string;
+  smsUrl?: string;
+  smsSender?: string;
+  paymentKey?: string;
+}
+
+export interface Firm {
+  name: string;
+  nameUrdu: string;
+  tagline: string;
+  integrations?: Integrations;
+}
+
 export interface DB {
-  firm: { name: string; nameUrdu: string; tagline: string };
+  firm: Firm;
   users: User[];
   courts: Court[];
   clients: ClientParty[];

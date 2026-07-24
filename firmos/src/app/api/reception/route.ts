@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDB, persist, uid, enqueueNotification } from "@/lib/db";
 import { geminiGenerate } from "@/lib/ai";
+import { resolveIntegrations } from "@/lib/settings";
 
 /**
  * AI Receptionist intake API (PRD §5.4 AI-1).
@@ -103,12 +104,15 @@ export async function POST(req: NextRequest) {
       role: (m.from === "caller" ? "user" : "model") as "user" | "model",
       text: m.text,
     }));
+    const ai = resolveIntegrations(db);
     const polished = await geminiGenerate({
       system:
         "You are a law chamber's receptionist in Pakistan. Rephrase the given reply naturally and warmly, in the same language the caller is using (English or Urdu). Preserve every fact, time, and question exactly. Never give legal advice, never quote fees, never invent information. Output only the rephrased reply, nothing else.",
       turns,
       user: `Rephrase this receptionist reply (keep all facts/questions intact): "${reply}"`,
       maxTokens: 300,
+      apiKey: ai.geminiApiKey,
+      model: ai.geminiModel,
     });
     if (polished) reply = polished;
   }

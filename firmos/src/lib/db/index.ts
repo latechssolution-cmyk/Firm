@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { buildSeed } from "./seed";
 import { sendWhatsApp, sendSms } from "../notify-adapters";
+import { resolveIntegrations } from "../settings";
 import type { DB, AuditEvent, NotificationRec } from "./types";
 
 /**
@@ -314,9 +315,10 @@ export async function enqueueNotification(n: Omit<NotificationRec, "id" | "statu
   // Await dispatch so the final status is captured in the single persist below
   // (serverless-safe — a backgrounded update would be killed after the response).
   const phone = n.recipient.match(/\(([^)]+)\)/)?.[1] ?? "";
+  const cfg = resolveIntegrations(db); // Settings-over-env, so channels can be enabled live
   const result =
-    n.channel === "whatsapp" ? await sendWhatsApp(phone, n.payload)
-    : n.channel === "sms" ? await sendSms(phone, n.payload)
+    n.channel === "whatsapp" ? await sendWhatsApp(phone, n.payload, { token: cfg.whatsappToken, phoneId: cfg.whatsappPhoneId })
+    : n.channel === "sms" ? await sendSms(phone, n.payload, { url: cfg.smsUrl, key: cfg.smsKey, sender: cfg.smsSender })
     : ({ ok: true } as const);
 
   if (result === null) rec.note = "No gateway configured — see Settings → Integrations";
