@@ -23,7 +23,7 @@ export default async function FirmLayout({ children }: { children: React.ReactNo
     <div className="flex min-h-screen">
       <aside
         className="hidden w-60 shrink-0 flex-col gap-1 border-r p-4 md:flex"
-        style={{ background: "var(--color-surface)", borderColor: "var(--color-border-subtle)" }}
+        style={{ background: "var(--color-surface)", borderColor: "var(--color-border-subtle)", boxShadow: "var(--shadow-sm)" }}
       >
         <div className="mb-4">
           <div className="font-bold leading-tight">{db.firm.name}</div>
@@ -59,7 +59,7 @@ export default async function FirmLayout({ children }: { children: React.ReactNo
           </div>
           <ThemeToggle />
         </div>
-        {children}
+        <div className="animate-in">{children}</div>
       </main>
     </div>
   );

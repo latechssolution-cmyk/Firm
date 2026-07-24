@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
 
-export function Card({ children, elevated = false, className = "" }: { children: ReactNode; elevated?: boolean; className?: string }) {
+export function Card({ children, elevated = false, hover = false, className = "" }: { children: ReactNode; elevated?: boolean; hover?: boolean; className?: string }) {
   return (
     <div
-      className={`themed rounded-lg p-4 ${className}`}
+      className={`themed card rounded-lg p-4 ${hover ? "card-hover" : ""} ${className}`}
       style={{
         background: elevated ? "var(--color-surface-elev)" : "var(--color-surface)",
         border: "1px solid var(--color-border-subtle)",

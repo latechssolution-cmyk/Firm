@@ -2,8 +2,9 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getDB } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
-import { setDocumentStatus, logDocumentView } from "@/lib/actions";
+import { setDocumentStatus, logDocumentView, deleteDocument } from "@/lib/actions";
 import { Card, PageTitle, Badge, Button, toneForDocStatus } from "@/components/ui";
+import { DeleteButton } from "@/components/DeleteButton";
 import { PrintButton } from "@/components/PrintButton";
 import { WorkerRender } from "@/components/WorkerRender";
 import { supabaseConfigured } from "@/lib/db";
@@ -45,6 +46,7 @@ export default async function DocumentDetail({ params }: { params: { id: string 
           </select>
           <Button kind="primary">Update</Button>
         </form>
+        <div className="ml-auto"><DeleteButton id={doc.id} action={deleteDocument} confirm={`Delete "${doc.title}"?`} /></div>
       </div>
 
       {doc.body && (

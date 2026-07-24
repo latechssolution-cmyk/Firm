@@ -16,7 +16,7 @@ export default async function DocumentsPage() {
       <div className="mb-4 grid gap-3 md:grid-cols-3 lg:grid-cols-5">
         {TEMPLATES.map((t) => (
           <Link key={t.id} href={`/documents/generate?template=${t.id}`} className="no-underline">
-            <Card className="h-full">
+            <Card hover className="h-full">
               <div className="text-sm font-bold" style={{ color: "var(--color-text-primary)" }}>{t.name}</div>
               <div className="mt-1 text-xs" style={{ color: "var(--color-text-secondary)" }}>{t.description}</div>
             </Card>

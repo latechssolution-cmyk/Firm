@@ -2,9 +2,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDB } from "@/lib/db";
 import { requireUser, canSeeFees } from "@/lib/auth";
-import { recordHearing } from "@/lib/actions";
+import { recordHearing, deleteCase, deleteHearing, addFeeEntry, deleteFeeEntry } from "@/lib/actions";
 import { Card, PageTitle, Badge, Button, toneForDocStatus, rupees, Empty } from "@/components/ui";
 import { CaseSummary } from "@/components/CaseSummary";
+import { DeleteButton } from "@/components/DeleteButton";
 import { IconClock, IconSparkle } from "@/components/icons";
 import { caseDeadlines, caseAgeDays, nextHearing, isStale, suggestNextStage, stageFlow } from "@/lib/insights";
 
@@ -32,7 +33,13 @@ export default async function CaseDetail({ params }: { params: { id: string } })
 
   return (
     <div>
-      <PageTitle right={<Badge tone={kase.status === "active" ? "info" : "success"}>{kase.status}</Badge>}>
+      <PageTitle right={
+        <div className="flex items-center gap-2">
+          <Badge tone={kase.status === "active" ? "info" : "success"}>{kase.status}</Badge>
+          <Link href={`/cases/${kase.id}/edit`} className="themed btn-secondary rounded-md px-3 py-1.5 text-sm font-semibold no-underline">Edit</Link>
+          {canSeeFees(user) && <DeleteButton id={kase.id} action={deleteCase} confirm={`Delete "${kase.title}" and all its hearings, documents and fees? This cannot be undone.`} small />}
+        </div>
+      }>
         {kase.title}
       </PageTitle>
       <div className="mb-4 text-sm" style={{ color: "var(--color-text-secondary)" }}>
@@ -65,7 +72,10 @@ export default async function CaseDetail({ params }: { params: { id: string } })
                 <div key={h.id} className="rounded-md border p-3" style={{ borderColor: "var(--color-border-subtle)" }}>
                   <div className="flex items-center justify-between gap-2 text-sm">
                     <span className="font-semibold">{h.date}{h.time ? ` · ${h.time}` : ""} — {h.purpose}</span>
-                    {!h.outcomeNote && <Badge tone={h.readiness === "ready" ? "success" : "warning"}>{h.readiness === "ready" ? "File ready" : "Upcoming"}</Badge>}
+                    <div className="flex items-center gap-2">
+                      {!h.outcomeNote && <Badge tone={h.readiness === "ready" ? "success" : "warning"}>{h.readiness === "ready" ? "File ready" : "Upcoming"}</Badge>}
+                      <DeleteButton id={h.id} action={deleteHearing} label="✕" small confirm="Delete this hearing entry?" />
+                    </div>
                   </div>
                   {h.outcomeNote && <div className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>{h.outcomeNote}{h.nextDate ? ` — next date ${h.nextDate}` : ""}</div>}
                 </div>
@@ -157,6 +167,32 @@ export default async function CaseDetail({ params }: { params: { id: string } })
               <div className="mt-1 text-sm font-bold" style={{ color: agreed - received > 0 ? "var(--color-warning)" : "var(--color-success)" }}>
                 Balance {rupees(agreed - received)}
               </div>
+
+              {fees.length > 0 && (
+                <div className="mt-3 flex flex-col gap-1 border-t pt-2" style={{ borderColor: "var(--color-border-subtle)" }}>
+                  {fees.map((f) => (
+                    <div key={f.id} className="flex items-center justify-between gap-2 text-xs">
+                      <span><span className="capitalize font-semibold">{f.kind}</span> · {rupees(f.amount)}{f.method ? ` · ${f.method}` : ""} <span style={{ color: "var(--color-text-secondary)" }}>{f.date}</span></span>
+                      <DeleteButton id={f.id} action={deleteFeeEntry} label="✕" small confirm="Delete this fee entry?" />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <form action={addFeeEntry} className="mt-3 flex flex-wrap items-end gap-2 border-t pt-3" style={{ borderColor: "var(--color-border-subtle)" }}>
+                <input type="hidden" name="caseId" value={kase.id} />
+                <label className="text-xs">Type
+                  <select name="kind" className="mt-1 !w-auto !py-1 text-xs" aria-label="Fee type">
+                    <option value="agreed">Agreed</option>
+                    <option value="received">Received</option>
+                    <option value="adjustment">Adjustment</option>
+                  </select>
+                </label>
+                <label className="text-xs">Amount
+                  <input name="amount" type="number" min={1} placeholder="Rs" className="mt-1 !w-24 !py-1 text-xs" aria-label="Amount" />
+                </label>
+                <Button kind="secondary">Add</Button>
+              </form>
             </Card>
           )}
         </div>

@@ -21,8 +21,8 @@ export function Toaster() {
   if (!msg) return null;
   return (
     <div role="status" aria-live="polite"
-      className="themed fixed bottom-5 left-1/2 z-50 -translate-x-1/2 rounded-md border px-4 py-2.5 text-sm font-semibold shadow-none"
-      style={{ background: "var(--color-surface-elev)", borderColor: "var(--color-success)", color: "var(--color-text-primary)" }}>
+      className="themed toast-in fixed bottom-5 left-1/2 z-50 -translate-x-1/2 rounded-md border px-4 py-2.5 text-sm font-semibold"
+      style={{ background: "var(--color-surface-elev)", borderColor: "var(--color-success)", color: "var(--color-text-primary)", boxShadow: "var(--shadow-lg)" }}>
       <span style={{ color: "var(--color-success)" }}>✓</span> {msg}
     </div>
   );

@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { getDB } from "@/lib/db";
-import { requireUser } from "@/lib/auth";
+import { requireUser, canSeeFees } from "@/lib/auth";
+import { deleteCase } from "@/lib/actions";
 import { PageTitle, Badge, Card } from "@/components/ui";
 import { GlobalSearch } from "@/components/GlobalSearch";
+import { DeleteButton } from "@/components/DeleteButton";
 
 export default async function CasesPage({ searchParams }: { searchParams: { type?: string } }) {
-  await requireUser(["admin", "associate", "clerk"]);
+  const user = await requireUser(["admin", "associate", "clerk"]);
   const db = await getDB();
   const type = searchParams.type;
   const cases = db.cases.filter((c) => (type ? c.type === type : true));
@@ -27,7 +29,7 @@ export default async function CasesPage({ searchParams }: { searchParams: { type
       <Card className="overflow-x-auto !p-0">
         <table>
           <thead>
-            <tr><th>Case</th><th>Number</th><th>Court</th><th>Stage</th><th>Client</th><th>Status</th></tr>
+            <tr><th>Case</th><th>Number</th><th>Court</th><th>Stage</th><th>Client</th><th>Status</th><th>Actions</th></tr>
           </thead>
           <tbody>
             {cases.slice(0, 100).map((c) => {
@@ -41,6 +43,12 @@ export default async function CasesPage({ searchParams }: { searchParams: { type
                   <td>{c.stage}</td>
                   <td>{client?.name}</td>
                   <td><Badge tone={c.status === "active" ? "info" : c.status === "decided" ? "success" : "neutral"}>{c.status}</Badge></td>
+                  <td>
+                    <div className="flex items-center gap-2">
+                      <Link href={`/cases/${c.id}/edit`} className="themed btn-secondary rounded-md px-2.5 py-1 text-xs font-semibold no-underline">Edit</Link>
+                      {canSeeFees(user) && <DeleteButton id={c.id} action={deleteCase} small confirm={`Delete "${c.title}" and all its records?`} />}
+                    </div>
+                  </td>
                 </tr>
               );
             })}

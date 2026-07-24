@@ -85,8 +85,8 @@ export function DesignDemo() {
           style={{ background: "color-mix(in srgb, var(--color-bg) 60%, transparent)" }}
           onClick={() => setModalOpen(false)}>
           <div onClick={(e) => e.stopPropagation()}
-            className="themed w-full max-w-md rounded-lg border p-5"
-            style={{ background: "var(--color-surface-elev)", borderColor: "var(--color-border-interactive)" }}>
+            className="themed modal-in w-full max-w-md rounded-lg border p-5"
+            style={{ background: "var(--color-surface-elev)", borderColor: "var(--color-border-interactive)", boxShadow: "var(--shadow-lg)" }}>
             <h3 className="mb-2 font-bold">File this document?</h3>
             <p className="mb-4 text-sm" style={{ color: "var(--color-text-secondary)" }}>
               Marking as filed shares the final version with the client and locks this draft. This action is recorded in the audit log.
