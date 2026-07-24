@@ -166,8 +166,20 @@ export async function recordPayment(formData: FormData) {
   const user = await requireUser(["admin", "associate"]);
   const db = await getDB();
   const caseId = String(formData.get("caseId"));
-  const amount = Number(formData.get("amount"));
-  if (!amount || amount <= 0) return;
+  const kase = db.cases.find((c) => c.id === caseId);
+  if (!kase) redirect("/fees");
+
+  // Current outstanding balance for this case (agreed − received so far).
+  const fees = db.fees.filter((f) => f.caseId === caseId);
+  const agreed = fees.filter((f) => f.kind === "agreed").reduce((s, f) => s + f.amount, 0);
+  const already = fees.filter((f) => f.kind === "received").reduce((s, f) => s + f.amount, 0);
+  const outstanding = agreed - already;
+
+  let amount = Math.round(Number(formData.get("amount")));
+  if (!Number.isFinite(amount) || amount <= 0) redirect(`/fees?toast=${encodeURIComponent("Enter a valid payment amount")}`);
+  if (outstanding <= 0) redirect(`/fees?toast=${encodeURIComponent(`${kase.title} is already fully paid`)}`);
+  amount = Math.min(amount, outstanding); // never record more than the case's balance
+
   db.fees.push({
     id: uid("f"), caseId, kind: "received", amount,
     method: String(formData.get("method") || "cash") as "cash" | "bank" | "gateway",
@@ -175,20 +187,21 @@ export async function recordPayment(formData: FormData) {
     note: String(formData.get("note") || "") || undefined,
     enteredBy: user.id,
   });
-  const kase = db.cases.find((c) => c.id === caseId);
-  await audit({ userId: user.id, userName: user.name, action: "edit", entityType: "fees", entityId: kase?.number ?? caseId, detail: `Payment received Rs ${amount.toLocaleString()}` });
+  await audit({ userId: user.id, userName: user.name, action: "edit", entityType: "fees", entityId: kase.number, detail: `Payment received Rs ${amount.toLocaleString("en-PK")}` });
   await persist();
   revalidatePath("/fees");
   revalidatePath(`/cases/${caseId}`);
+  const remaining = outstanding - amount;
+  redirect(`/fees?toast=${encodeURIComponent(`Recorded Rs ${amount.toLocaleString("en-PK")}${remaining > 0 ? ` — Rs ${remaining.toLocaleString("en-PK")} remaining` : " — fully paid"}`)}`);
 }
 
 export async function sendFeeReminder(formData: FormData) {
   const user = await requireUser(["admin", "associate"]);
   const db = await getDB();
   const kase = db.cases.find((c) => c.id === String(formData.get("caseId")));
-  if (!kase) return;
+  if (!kase) redirect("/fees");
   const client = db.clients.find((cl) => cl.id === kase.clientId);
-  if (!client) return;
+  if (!client) redirect(`/fees?toast=${encodeURIComponent("No client on file for this case")}`);
   await enqueueNotification({
     recipient: `${client.name} (${client.phone})`,
     channel: "whatsapp",
@@ -198,6 +211,7 @@ export async function sendFeeReminder(formData: FormData) {
   await audit({ userId: user.id, userName: user.name, action: "edit", entityType: "fees", entityId: kase.number, detail: "Fee reminder queued" });
   await persist();
   revalidatePath("/fees");
+  redirect(`/fees?toast=${encodeURIComponent(`Reminder queued to ${client.name}`)}`);
 }
 
 export async function setInquiryStatus(formData: FormData) {
@@ -242,7 +256,9 @@ export async function remindAllOverdue() {
   const user = await requireUser(["admin", "associate"]);
   const db = await getDB();
   let sent = 0;
-  for (const kase of db.cases.filter((c) => c.status === "active")) {
+  // Every case with an outstanding balance — matches the "(N)" count on the button
+  // (fee collection applies whatever the case's status).
+  for (const kase of db.cases) {
     const fees = db.fees.filter((f) => f.caseId === kase.id);
     const bal = fees.filter((f) => f.kind === "agreed").reduce((s, f) => s + f.amount, 0) - fees.filter((f) => f.kind === "received").reduce((s, f) => s + f.amount, 0);
     if (bal <= 0) continue;
