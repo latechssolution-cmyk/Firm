@@ -31,9 +31,9 @@ export default async function FeesPage() {
         Fees &amp; Billing
       </PageTitle>
 
-      <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Stat label="Agreed" value={rupees(fa.agreed)} icon={<IconFees size={18} />} />
-        <Stat label="Received" value={rupees(fa.received)} tone="success" />
+      <div className="stagger mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Stat featured label="Received" value={rupees(fa.received)} sub={`${fa.collectionRate}% of agreed`} icon={<IconFees size={18} />} />
+        <Stat label="Agreed" value={rupees(fa.agreed)} />
         <Stat label="Pending" value={rupees(fa.pending)} tone="warning" sub={`${fa.casesWithBalance} cases`} />
         <Stat label="Collection rate" value={`${fa.collectionRate}%`} tone={fa.collectionRate >= 70 ? "success" : "warning"} />
       </div>

@@ -6,6 +6,7 @@ import { ThemeToggle } from "@/lib/theme/ThemeToggle";
 import { NavLinks } from "@/components/NavLinks";
 import { MobileNav } from "@/components/MobileNav";
 import { IconCases } from "@/components/icons";
+import { Avatar } from "@/components/Avatar";
 
 export default async function FirmLayout({ children }: { children: React.ReactNode }) {
   const user = await requireUser(["admin", "associate", "clerk"]);
@@ -51,14 +52,18 @@ export default async function FirmLayout({ children }: { children: React.ReactNo
           </div>
         </div>
         <NavLinks items={sectioned} />
-        <div className="mt-auto flex flex-col gap-2 pt-4">
-          <div className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
-            {user.name} · {user.role}
+        <div className="mt-auto flex flex-col gap-3 pt-4">
+          <div className="flex items-center gap-2.5 rounded-xl border p-2.5" style={{ borderColor: "var(--color-border-subtle)", background: "var(--color-bg)" }}>
+            <Avatar name={user.name} size={34} />
+            <div className="min-w-0 flex-1">
+              <div className="truncate text-sm font-semibold">{user.name}</div>
+              <div className="truncate text-xs capitalize" style={{ color: "var(--color-text-secondary)" }}>{user.role}</div>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
             <form action={logout}>
-              <button type="submit" className="themed rounded-md px-3 py-1.5 text-sm btn-secondary">Sign out</button>
+              <button type="submit" className="themed rounded-full px-3 py-1.5 text-sm btn-secondary">Sign out</button>
             </form>
           </div>
         </div>

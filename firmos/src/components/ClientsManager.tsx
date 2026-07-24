@@ -6,6 +6,7 @@ import { Button } from "@/components/ui";
 import { DeleteButton } from "@/components/DeleteButton";
 import { Modal } from "@/components/Modal";
 import { Field } from "@/components/Field";
+import { Avatar } from "@/components/Avatar";
 
 type Client = { id: string; name: string; cnic?: string; phone: string; address?: string; languagePref: "en" | "ur"; caseCount: number };
 
@@ -35,7 +36,12 @@ export function ClientsManager({ clients }: { clients: Client[] }) {
           <tbody>
             {clients.map((c) => (
               <tr key={c.id}>
-                <td className="font-semibold">{c.name}</td>
+                <td>
+                  <span className="flex items-center gap-2.5">
+                    <Avatar name={c.name} size={30} />
+                    <span className="font-semibold">{c.name}</span>
+                  </span>
+                </td>
                 <td>{c.cnic ?? "—"}</td>
                 <td>{c.phone}</td>
                 <td className="uppercase">{c.languagePref}</td>
