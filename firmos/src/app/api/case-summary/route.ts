@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDB } from "@/lib/db";
 import { currentUser } from "@/lib/auth";
 import { caseDeadlines, caseBalance, nextHearing } from "@/lib/insights";
+import { geminiGenerate } from "@/lib/ai";
 
 /**
  * AI case summary. Builds a factual brief of the case from its records; when
- * ANTHROPIC_API_KEY is set, Claude turns it into a concise plain-English summary
+ * GEMINI_API_KEY is set, Gemini turns it into a concise plain-English summary
  * with suggested next steps. Falls back to a deterministic brief otherwise.
  */
 export async function POST(req: NextRequest) {
@@ -36,24 +37,12 @@ export async function POST(req: NextRequest) {
     `Hearing history (${held.length}): ${held.map((h) => `${h.date} — ${h.outcomeNote}`).join(" | ") || "none recorded"}`,
   ].filter(Boolean).join("\n");
 
-  if (process.env.ANTHROPIC_API_KEY) {
-    try {
-      const r = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: { "x-api-key": process.env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-5", max_tokens: 500,
-          system: "You are a legal associate at a Pakistani law firm. Given case facts, write a crisp 3-4 sentence status summary followed by 2-3 concrete next steps as a bullet list. Be practical and specific to Pakistani court practice. Do not invent facts not present.",
-          messages: [{ role: "user", content: facts }],
-        }),
-      });
-      if (r.ok) {
-        const data = await r.json();
-        const text = data?.content?.[0]?.text;
-        if (typeof text === "string" && text.trim()) return NextResponse.json({ summary: text.trim(), ai: true });
-      }
-    } catch { /* fall through */ }
-  }
+  const aiSummary = await geminiGenerate({
+    system: "You are a legal associate at a Pakistani law firm. Given case facts, write a crisp 3-4 sentence status summary followed by 2-3 concrete next steps as a bullet list. Be practical and specific to Pakistani court practice. Do not invent facts not present.",
+    user: facts,
+    maxTokens: 600,
+  });
+  if (aiSummary) return NextResponse.json({ summary: aiSummary, ai: true });
 
   // Deterministic fallback brief.
   const nextSteps: string[] = [];

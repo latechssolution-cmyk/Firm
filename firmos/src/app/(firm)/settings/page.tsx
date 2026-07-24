@@ -13,7 +13,7 @@ export default async function SettingsPage() {
     { name: "SMS gateway (branded mask)", env: "SMS_GATEWAY_KEY + SMS_GATEWAY_URL", configured: !!(process.env.SMS_GATEWAY_KEY && process.env.SMS_GATEWAY_URL) },
     { name: "WhatsApp Business Cloud API", env: "WHATSAPP_TOKEN + WHATSAPP_PHONE_ID", configured: !!(process.env.WHATSAPP_TOKEN && process.env.WHATSAPP_PHONE_ID) },
     { name: "Payment gateway (PayFast/Kuickpay)", env: "PAYMENT_GATEWAY_KEY", configured: !!process.env.PAYMENT_GATEWAY_KEY },
-    { name: "Claude API (AI receptionist LLM)", env: "ANTHROPIC_API_KEY", configured: !!process.env.ANTHROPIC_API_KEY },
+    { name: "Gemini API (AI receptionist LLM)", env: "GEMINI_API_KEY", configured: !!process.env.GEMINI_API_KEY },
     { name: "Supabase (production data layer)", env: "SUPABASE_URL", configured: !!process.env.SUPABASE_URL },
   ];
   return (
