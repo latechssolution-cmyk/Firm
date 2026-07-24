@@ -25,11 +25,14 @@ export default async function SettingsPage() {
 
       <Card className="mb-4">
         <h2 className="mb-3 font-bold">Integrations</h2>
-        <div className="flex flex-col gap-2">
+        <div className="grid gap-2 sm:grid-cols-2">
           {integrations.map((i) => (
-            <div key={i.env} className="flex items-center justify-between gap-2 text-sm">
-              <span>{i.name} <code className="text-xs" style={{ color: "var(--color-text-secondary)" }}>({i.env})</code></span>
-              <Badge tone={i.configured ? "success" : "warning"}>{i.configured ? "configured" : "not configured"}</Badge>
+            <div key={i.env} className="flex items-center justify-between gap-2 rounded-xl border p-3" style={{ borderColor: "var(--color-border-subtle)" }}>
+              <span className="min-w-0">
+                <span className="block truncate text-sm font-semibold">{i.name}</span>
+                <code className="text-[11px]" style={{ color: "var(--color-text-secondary)" }}>{i.env}</code>
+              </span>
+              <Badge tone={i.configured ? "success" : "warning"}>{i.configured ? "on" : "off"}</Badge>
             </div>
           ))}
         </div>

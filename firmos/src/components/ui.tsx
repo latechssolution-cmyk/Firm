@@ -95,8 +95,16 @@ export function PageTitle({ children, right }: { children: ReactNode; right?: Re
   );
 }
 
-export function Empty({ children }: { children: ReactNode }) {
-  return <div className="py-10 text-center text-sm" style={{ color: "var(--color-text-secondary)" }}>{children}</div>;
+export function Empty({ children, icon }: { children: ReactNode; icon?: ReactNode }) {
+  return (
+    <div className="flex flex-col items-center gap-2.5 py-10 text-center text-sm" style={{ color: "var(--color-text-secondary)" }}>
+      <span className="flex h-11 w-11 items-center justify-center rounded-full"
+        style={{ background: "var(--color-muted-bg)", color: "var(--color-text-secondary)" }}>
+        {icon ?? <span className="text-lg">·</span>}
+      </span>
+      <span className="max-w-xs">{children}</span>
+    </div>
+  );
 }
 
 /** Section heading inside a card — consistent weight/size across the app. */

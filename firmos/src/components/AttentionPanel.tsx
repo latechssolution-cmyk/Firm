@@ -26,18 +26,21 @@ export function AttentionPanel({ items }: { items: AttentionItem[] }) {
           <span>Nothing needs attention. Every hearing is prepared, no deadlines loom, fees are current.</span>
         </div>
       ) : (
-        <div className="flex flex-col gap-1.5">
+        <div className="stagger flex flex-col gap-2">
           {shown.map((it, i) => (
             <Link key={i} href={it.href}
-              className="themed flex items-start gap-3 rounded-md border p-2.5 no-underline"
-              style={{ borderColor: "var(--color-border-subtle)", color: "var(--color-text-primary)" }}>
-              <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full" style={{ background: dot[it.priority] }} aria-hidden />
+              className="themed card-hover flex items-center gap-3 overflow-hidden rounded-xl border p-2.5 pl-3 no-underline"
+              style={{ borderColor: "var(--color-border-subtle)", color: "var(--color-text-primary)", borderLeft: `3px solid ${dot[it.priority]}` }}>
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+                style={{ background: `color-mix(in srgb, ${dot[it.priority]} 14%, transparent)`, color: dot[it.priority] }} aria-hidden>
+                <IconAlert size={15} />
+              </span>
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-sm font-semibold">{it.title}</span>
                 <span className="block truncate text-xs" style={{ color: "var(--color-text-secondary)" }}>{it.detail}</span>
               </span>
-              <span className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide"
-                style={{ color: dot[it.priority], border: `1px solid ${dot[it.priority]}` }}>
+              <span className="shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide"
+                style={{ color: dot[it.priority], background: `color-mix(in srgb, ${dot[it.priority]} 12%, transparent)` }}>
                 {label[it.priority]}
               </span>
             </Link>
