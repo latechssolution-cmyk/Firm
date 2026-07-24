@@ -3,6 +3,7 @@ import { getDB } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { notifyTomorrowHearings } from "@/lib/actions";
 import { PageTitle, Card, Badge, Button, toneForReadiness, Empty } from "@/components/ui";
+import { PrintButton } from "@/components/PrintButton";
 
 export default async function DiaryPage() {
   await requireUser(["admin", "associate", "clerk"]);
@@ -27,16 +28,25 @@ export default async function DiaryPage() {
   return (
     <div>
       <PageTitle right={
-        tomorrowCount > 0 ? (
-          <form action={notifyTomorrowHearings}>
-            <Button kind="primary">Notify tomorrow&apos;s clients ({tomorrowCount})</Button>
-          </form>
-        ) : undefined
+        <div className="flex items-center gap-2">
+          <PrintButton label="Print cause list" />
+          {tomorrowCount > 0 && (
+            <form action={notifyTomorrowHearings}>
+              <Button kind="primary">Notify tomorrow&apos;s clients ({tomorrowCount})</Button>
+            </form>
+          )}
+        </div>
       }>
         Court Diary <span className="text-sm font-normal" style={{ color: "var(--color-text-secondary)" }}>(next 30 days)</span>
       </PageTitle>
+
+      <div className="print-only" style={{ marginBottom: 16 }}>
+        <div style={{ fontWeight: 700, fontSize: 18 }}>{db.firm.name} — Cause List</div>
+        <div style={{ fontSize: 12 }}>Upcoming hearings · generated {today}</div>
+      </div>
+
       {byDate.size === 0 && <Card><Empty>No upcoming hearings.</Empty></Card>}
-      <div className="flex flex-col gap-4">
+      <div className="printable flex flex-col gap-4">
         {Array.from(byDate.entries()).map(([date, hs]) => (
           <Card key={date}>
             <h2 className="mb-3 font-bold">{label(date)} <span className="text-xs font-normal" style={{ color: "var(--color-text-secondary)" }}>· {hs.length} {hs.length === 1 ? "hearing" : "hearings"}</span></h2>

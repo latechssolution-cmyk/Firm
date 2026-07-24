@@ -6,7 +6,7 @@ import { recordHearing } from "@/lib/actions";
 import { Card, PageTitle, Badge, Button, toneForDocStatus, rupees, Empty } from "@/components/ui";
 import { CaseSummary } from "@/components/CaseSummary";
 import { IconClock, IconSparkle } from "@/components/icons";
-import { caseDeadlines, caseAgeDays, nextHearing, isStale, suggestNextStage } from "@/lib/insights";
+import { caseDeadlines, caseAgeDays, nextHearing, isStale, suggestNextStage, stageFlow } from "@/lib/insights";
 
 export default async function CaseDetail({ params }: { params: { id: string } }) {
   const user = await requireUser(["admin", "associate", "clerk"]);
@@ -88,8 +88,14 @@ export default async function CaseDetail({ params }: { params: { id: string } })
                 <input type="date" name="nextDate" className="mt-1" />
               </label>
               <label className="text-sm md:col-span-2">
-                Advance stage {suggested && <span style={{ color: "var(--color-info)" }}>· suggested: {suggested}</span>}
-                <input name="newStage" defaultValue={suggested ?? ""} placeholder={`Keep "${kase.stage}"`} className="mt-1" />
+                Case stage after this hearing
+                <select name="newStage" defaultValue="" className="mt-1">
+                  <option value="">Keep &quot;{kase.stage}&quot;</option>
+                  {suggested && <option value={suggested}>→ Advance to: {suggested} (suggested)</option>}
+                  {stageFlow(kase.type).filter((s) => s !== kase.stage && s !== suggested).map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
               </label>
               <div className="md:col-span-2"><Button kind="primary">Save hearing</Button></div>
             </form>
