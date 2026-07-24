@@ -27,7 +27,7 @@ export function Card({ children, elevated = false, hover = false, className = ""
   );
 }
 
-export function Stat({ label, value, sub, tone, icon, featured = false }: { label: string; value: string; sub?: string; tone?: "success" | "warning" | "danger" | "info"; icon?: ReactNode; featured?: boolean }) {
+export function Stat({ label, value, sub, tone, icon, featured = false }: { label: string; value: ReactNode; sub?: string; tone?: "success" | "warning" | "danger" | "info"; icon?: ReactNode; featured?: boolean }) {
   if (featured) {
     return (
       <div className="themed card card-hover rounded-2xl p-5" style={{ background: "var(--color-accent-surface)", color: "var(--color-on-accent)", border: "1px solid transparent", boxShadow: "var(--shadow-md)" }}>
