@@ -5,6 +5,7 @@ import { deleteCase } from "@/lib/actions";
 import { PageTitle, Badge, Card, LinkButton } from "@/components/ui";
 import { GlobalSearch } from "@/components/GlobalSearch";
 import { DeleteButton } from "@/components/DeleteButton";
+import { CaseRow } from "@/components/CaseRow";
 
 export default async function CasesPage({ searchParams }: { searchParams: { type?: string } }) {
   const user = await requireUser(["admin", "associate", "clerk"]);
@@ -36,20 +37,20 @@ export default async function CasesPage({ searchParams }: { searchParams: { type
               const court = db.courts.find((ct) => ct.id === c.courtId);
               const client = db.clients.find((cl) => cl.id === c.clientId);
               return (
-                <tr key={c.id}>
+                <CaseRow key={c.id} href={`/cases/${c.id}`}
+                  actions={
+                    <div className="flex items-center gap-2">
+                      <Link href={`/cases/${c.id}/edit`} className="themed btn-secondary rounded-md px-2.5 py-1 text-xs font-semibold no-underline">Edit</Link>
+                      {canSeeFees(user) && <DeleteButton id={c.id} action={deleteCase} small confirm={`Delete "${c.title}" and all its records?`} />}
+                    </div>
+                  }>
                   <td><Link href={`/cases/${c.id}`} className="font-semibold">{c.title}</Link></td>
                   <td className="whitespace-nowrap">{c.number}</td>
                   <td>{court?.name}{court?.bench ? ` (${court.bench})` : ""}</td>
                   <td>{c.stage}</td>
                   <td>{client?.name}</td>
                   <td><Badge tone={c.status === "active" ? "info" : c.status === "decided" ? "success" : "neutral"}>{c.status}</Badge></td>
-                  <td>
-                    <div className="flex items-center gap-2">
-                      <Link href={`/cases/${c.id}/edit`} className="themed btn-secondary rounded-md px-2.5 py-1 text-xs font-semibold no-underline">Edit</Link>
-                      {canSeeFees(user) && <DeleteButton id={c.id} action={deleteCase} small confirm={`Delete "${c.title}" and all its records?`} />}
-                    </div>
-                  </td>
-                </tr>
+                </CaseRow>
               );
             })}
           </tbody>

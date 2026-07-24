@@ -89,6 +89,7 @@ export async function createCase(formData: FormData) {
   await audit({ userId: user.id, userName: user.name, action: "create", entityType: "case", entityId: String(formData.get("number")) });
   await persist();
   revalidatePath("/cases");
+  revalidatePath("/dashboard");
   redirect(`/cases/${id}?toast=${encodeURIComponent("Case created")}`);
 }
 
@@ -112,6 +113,7 @@ export async function updateCase(formData: FormData) {
   await persist();
   revalidatePath(`/cases/${kase.id}`);
   revalidatePath("/cases");
+  revalidatePath("/dashboard");
   redirect(`/cases/${kase.id}?toast=${encodeURIComponent("Case updated")}`);
 }
 
@@ -128,6 +130,7 @@ export async function deleteCase(formData: FormData) {
   db.audit.unshift({ id: uid("a"), userId: user.id, userName: user.name, action: "edit", entityType: "case", entityId: kase.number, detail: "Case deleted (with its hearings, documents, fees)", at: new Date().toISOString() });
   await resyncAll();
   revalidatePath("/cases");
+  revalidatePath("/dashboard");
   redirect(`/cases?toast=${encodeURIComponent(`Deleted ${kase.title}`)}`);
 }
 
@@ -145,6 +148,7 @@ export async function generateDocument(formData: FormData) {
   });
   await audit({ userId: user.id, userName: user.name, action: "create", entityType: "document", entityId: title });
   await persist();
+  revalidatePath("/dashboard");
   redirect(`/documents/${id}`);
 }
 
@@ -192,6 +196,7 @@ export async function recordPayment(formData: FormData) {
   await persist();
   revalidatePath("/fees");
   revalidatePath(`/cases/${caseId}`);
+  revalidatePath("/dashboard");
   const remaining = outstanding - amount;
   redirect(`/fees?toast=${encodeURIComponent(`Recorded Rs ${amount.toLocaleString("en-PK")}${remaining > 0 ? ` — Rs ${remaining.toLocaleString("en-PK")} remaining` : " — fully paid"}`)}`);
 }
@@ -224,6 +229,7 @@ export async function setInquiryStatus(formData: FormData) {
   await audit({ userId: user.id, userName: user.name, action: "edit", entityType: "inquiry", entityId: q.callerName, detail: `status=${q.status}` });
   await persist();
   revalidatePath("/inquiries");
+  revalidatePath("/dashboard");
 }
 
 /** Automation: queue a reminder to every client with a hearing tomorrow (day-before digest). */
@@ -297,6 +303,7 @@ export async function convertInquiry(formData: FormData) {
   await persist();
   revalidatePath("/inquiries");
   revalidatePath("/clients");
+  revalidatePath("/dashboard");
   redirect(`/clients?toast=${encodeURIComponent(`${q.callerName} added as a client`)}`);
 }
 
@@ -382,6 +389,7 @@ export async function deleteHearing(formData: FormData) {
   await resyncAll();
   revalidatePath(`/cases/${caseId}`);
   revalidatePath("/diary");
+  revalidatePath("/dashboard");
 }
 
 // ---- Document delete ----------------------------------------------------
@@ -396,6 +404,7 @@ export async function deleteDocument(formData: FormData) {
   db.audit.unshift({ id: uid("a"), userId: user.id, userName: user.name, action: "edit", entityType: "document", entityId: doc.title, detail: "Document deleted", at: new Date().toISOString() });
   await resyncAll();
   revalidatePath("/documents");
+  revalidatePath("/dashboard");
   redirect(`/cases/${caseId}?toast=${encodeURIComponent("Document deleted")}`);
 }
 
@@ -420,6 +429,7 @@ export async function addFeeEntry(formData: FormData) {
   await persist();
   revalidatePath(`/cases/${caseId}`);
   revalidatePath("/fees");
+  revalidatePath("/dashboard");
 }
 
 export async function deleteFeeEntry(formData: FormData) {
@@ -433,6 +443,7 @@ export async function deleteFeeEntry(formData: FormData) {
   await resyncAll();
   revalidatePath(`/cases/${caseId}`);
   revalidatePath("/fees");
+  revalidatePath("/dashboard");
 }
 
 // ---- Inquiry create / delete -------------------------------------------
@@ -453,6 +464,7 @@ export async function createInquiry(formData: FormData) {
   await audit({ userId: user.id, userName: user.name, action: "create", entityType: "inquiry", entityId: name });
   await persist();
   revalidatePath("/inquiries");
+  revalidatePath("/dashboard");
   redirect(`/inquiries?toast=${encodeURIComponent("Inquiry logged")}`);
 }
 
@@ -465,6 +477,7 @@ export async function deleteInquiry(formData: FormData) {
   db.audit.unshift({ id: uid("a"), userId: user.id, userName: user.name, action: "edit", entityType: "inquiry", entityId: q.callerName, detail: "Inquiry deleted", at: new Date().toISOString() });
   await resyncAll();
   revalidatePath("/inquiries");
+  revalidatePath("/dashboard");
   redirect(`/inquiries?toast=${encodeURIComponent(`Deleted inquiry from ${q.callerName}`)}`);
 }
 
