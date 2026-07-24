@@ -4,6 +4,7 @@ import { getDB } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { updateCase } from "@/lib/actions";
 import { Card, PageTitle, Button } from "@/components/ui";
+import { Field } from "@/components/Field";
 
 export default async function EditCasePage({ params }: { params: { id: string } }) {
   await requireUser(["admin", "associate", "clerk"]);
@@ -15,58 +16,58 @@ export default async function EditCasePage({ params }: { params: { id: string } 
     <div className="max-w-2xl">
       <PageTitle right={<Link href={`/cases/${kase.id}`} className="text-sm">← Back to case</Link>}>Edit Case</PageTitle>
       <Card>
-        <form action={updateCase} className="grid gap-3 md:grid-cols-2">
+        <form action={updateCase} className="grid gap-4 md:grid-cols-2">
           <input type="hidden" name="id" value={kase.id} />
-          <label className="text-sm md:col-span-2">Title
-            <input name="title" required defaultValue={kase.title} className="mt-1" />
-          </label>
-          <label className="text-sm">Case number
-            <input name="number" required defaultValue={kase.number} className="mt-1" />
-          </label>
-          <label className="text-sm">Type
-            <select name="type" defaultValue={kase.type} className="mt-1">
+          <Field label="Case title" required className="md:col-span-2">
+            <input name="title" required defaultValue={kase.title} />
+          </Field>
+          <Field label="Case number" required>
+            <input name="number" required defaultValue={kase.number} />
+          </Field>
+          <Field label="Case type">
+            <select name="type" defaultValue={kase.type}>
               <option value="civil">Civil suit</option>
               <option value="criminal">Criminal</option>
               <option value="family">Family</option>
               <option value="writ">Writ petition</option>
               <option value="appeal">Appeal / Revision</option>
             </select>
-          </label>
-          <label className="text-sm">Court
-            <select name="courtId" defaultValue={kase.courtId} className="mt-1">
+          </Field>
+          <Field label="Court">
+            <select name="courtId" defaultValue={kase.courtId}>
               {db.courts.map((c) => <option key={c.id} value={c.id}>{c.name}{c.bench ? ` (${c.bench})` : ""} — {c.city}</option>)}
             </select>
-          </label>
-          <label className="text-sm">Client
-            <select name="clientId" defaultValue={kase.clientId} className="mt-1">
+          </Field>
+          <Field label="Client">
+            <select name="clientId" defaultValue={kase.clientId}>
               {db.clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
-          </label>
-          <label className="text-sm">Plaintiff / Petitioner
-            <input name="plaintiff" required defaultValue={kase.parties.plaintiff} className="mt-1" />
-          </label>
-          <label className="text-sm">Defendant / Respondent
-            <input name="defendant" required defaultValue={kase.parties.defendant} className="mt-1" />
-          </label>
-          <label className="text-sm">Stage
-            <input name="stage" defaultValue={kase.stage} className="mt-1" />
-          </label>
-          <label className="text-sm">Status
-            <select name="status" defaultValue={kase.status} className="mt-1">
+          </Field>
+          <Field label="Plaintiff / Petitioner" required>
+            <input name="plaintiff" required defaultValue={kase.parties.plaintiff} />
+          </Field>
+          <Field label="Defendant / Respondent" required>
+            <input name="defendant" required defaultValue={kase.parties.defendant} />
+          </Field>
+          <Field label="Current stage">
+            <input name="stage" defaultValue={kase.stage} />
+          </Field>
+          <Field label="Status">
+            <select name="status" defaultValue={kase.status}>
               <option value="active">Active</option>
               <option value="decided">Decided</option>
               <option value="dormant">Dormant</option>
             </select>
-          </label>
-          <label className="text-sm">FIR No.
-            <input name="firNo" defaultValue={kase.firNo ?? ""} className="mt-1" />
-          </label>
-          <label className="text-sm">Sections (comma-separated)
-            <input name="sections" defaultValue={(kase.sections ?? []).join(", ")} className="mt-1" />
-          </label>
-          <label className="text-sm">Limitation / deadline date
-            <input type="date" name="limitationDate" defaultValue={kase.limitationDate ?? ""} className="mt-1" />
-          </label>
+          </Field>
+          <Field label="FIR No.">
+            <input name="firNo" defaultValue={kase.firNo ?? ""} />
+          </Field>
+          <Field label="Sections" hint="Comma-separated">
+            <input name="sections" defaultValue={(kase.sections ?? []).join(", ")} />
+          </Field>
+          <Field label="Limitation / deadline date">
+            <input type="date" name="limitationDate" defaultValue={kase.limitationDate ?? ""} />
+          </Field>
           <div className="md:col-span-2"><Button kind="primary">Save changes</Button></div>
         </form>
       </Card>

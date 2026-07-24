@@ -1,4 +1,17 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
+
+/** A Link styled exactly like a Button — keeps navigation actions on-brand. */
+export function LinkButton({ href, children, kind = "primary", className = "" }: {
+  href: string; children: ReactNode; kind?: "primary" | "secondary"; className?: string;
+}) {
+  const cls = kind === "primary" ? "btn-primary" : "btn-secondary";
+  return (
+    <Link href={href} className={`themed ${cls} inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold no-underline ${className}`}>
+      {children}
+    </Link>
+  );
+}
 
 export function Card({ children, elevated = false, hover = false, className = "" }: { children: ReactNode; elevated?: boolean; hover?: boolean; className?: string }) {
   return (

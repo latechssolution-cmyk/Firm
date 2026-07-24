@@ -3,6 +3,7 @@ import { requireUser } from "@/lib/auth";
 import { logout } from "@/lib/actions";
 import { Card, Badge, rupees, Empty, toneForDocStatus } from "@/components/ui";
 import { ThemeToggle } from "@/lib/theme/ThemeToggle";
+import { IconCases } from "@/components/icons";
 import Link from "next/link";
 
 export default async function PortalPage() {
@@ -12,15 +13,21 @@ export default async function PortalPage() {
   const myCases = db.cases.filter((c) => c.clientId === user.clientId);
 
   return (
-    <main className="mx-auto max-w-3xl p-4 md:p-6">
-      <div className="mb-5 flex items-center justify-between gap-2">
-        <div>
-          <div className="font-bold">{db.firm.name} — Client Portal</div>
-          <div className="text-xs" style={{ color: "var(--color-text-secondary)" }}>{user.name} · read-only · secure login</div>
+    <main className="animate-in mx-auto max-w-3xl p-4 md:p-6">
+      <div className="mb-6 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+            style={{ background: "var(--color-primary)", color: "var(--color-on-primary)", boxShadow: "var(--shadow-sm)" }}>
+            <IconCases size={20} />
+          </span>
+          <div>
+            <div className="font-display text-lg font-bold leading-tight">{db.firm.name}</div>
+            <div className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Client portal · {user.name}</div>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <form action={logout}><button className="themed rounded-md px-3 py-1.5 text-sm btn-secondary">Sign out</button></form>
+          <form action={logout}><button className="themed rounded-lg px-3 py-1.5 text-sm btn-secondary">Sign out</button></form>
         </div>
       </div>
 

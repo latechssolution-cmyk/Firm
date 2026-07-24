@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getDB } from "@/lib/db";
 import { requireUser, canSeeFees } from "@/lib/auth";
 import { deleteCase } from "@/lib/actions";
-import { PageTitle, Badge, Card } from "@/components/ui";
+import { PageTitle, Badge, Card, LinkButton } from "@/components/ui";
 import { GlobalSearch } from "@/components/GlobalSearch";
 import { DeleteButton } from "@/components/DeleteButton";
 
@@ -15,7 +15,7 @@ export default async function CasesPage({ searchParams }: { searchParams: { type
 
   return (
     <div>
-      <PageTitle right={<div className="flex items-center gap-2"><GlobalSearch /><Link href="/cases/new" className="btn-primary themed rounded-md px-4 py-2 text-sm font-semibold no-underline">+ New case</Link></div>}>
+      <PageTitle right={<div className="flex items-center gap-2"><GlobalSearch /><LinkButton href="/cases/new">+ New case</LinkButton></div>}>
         Cases <span className="text-sm font-normal" style={{ color: "var(--color-text-secondary)" }}>({cases.length})</span>
       </PageTitle>
 
