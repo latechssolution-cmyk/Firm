@@ -5,6 +5,7 @@ import { logout } from "@/lib/actions";
 import { ThemeToggle } from "@/lib/theme/ThemeToggle";
 import { NavLinks } from "@/components/NavLinks";
 import { MobileNav } from "@/components/MobileNav";
+import { IconCases } from "@/components/icons";
 
 export default async function FirmLayout({ children }: { children: React.ReactNode }) {
   const user = await requireUser(["admin", "associate", "clerk"]);
@@ -25,9 +26,15 @@ export default async function FirmLayout({ children }: { children: React.ReactNo
         className="hidden w-60 shrink-0 flex-col gap-1 border-r p-4 md:flex"
         style={{ background: "var(--color-surface)", borderColor: "var(--color-border-subtle)", boxShadow: "var(--shadow-sm)" }}
       >
-        <div className="mb-4">
-          <div className="font-bold leading-tight">{db.firm.name}</div>
-          <div className="text-xs" style={{ color: "var(--color-text-secondary)" }}>{db.firm.nameUrdu}</div>
+        <div className="mb-5 flex items-center gap-2.5">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+            style={{ background: "var(--color-primary)", color: "var(--color-on-primary)", boxShadow: "var(--shadow-sm)" }}>
+            <IconCases size={18} />
+          </span>
+          <div className="min-w-0">
+            <div className="font-display truncate font-bold leading-tight">{db.firm.name}</div>
+            <div className="truncate text-xs" style={{ color: "var(--color-text-secondary)" }}>{db.firm.nameUrdu}</div>
+          </div>
         </div>
         <NavLinks items={items} />
         <div className="mt-auto flex flex-col gap-2 pt-4">
