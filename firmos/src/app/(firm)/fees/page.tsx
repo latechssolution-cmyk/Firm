@@ -3,13 +3,18 @@ import { getDB } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { recordPayment, sendFeeReminder, remindAllOverdue } from "@/lib/actions";
 import { PageTitle, Card, Button, Stat, rupees } from "@/components/ui";
-import { feeAnalytics } from "@/lib/insights";
+import { feeAnalytics, collectionsByMethod } from "@/lib/insights";
 import { IconFees } from "@/components/icons";
+
+const methodColor: Record<string, string> = {
+  cash: "var(--color-primary)", bank: "var(--color-info)", gateway: "var(--color-warning)",
+};
 
 export default async function FeesPage() {
   await requireUser(["admin", "associate"]);
   const db = await getDB();
   const fa = feeAnalytics(db);
+  const cbm = collectionsByMethod(db);
 
   const perCase = db.cases
     .map((c) => {
@@ -37,6 +42,31 @@ export default async function FeesPage() {
         <Stat label="Pending" value={rupees(fa.pending)} tone="warning" sub={`${fa.casesWithBalance} cases`} />
         <Stat label="Collection rate" value={`${fa.collectionRate}%`} tone={fa.collectionRate >= 70 ? "success" : "warning"} />
       </div>
+
+      {/* How the received money was actually collected. */}
+      <Card className="mb-4">
+        <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="font-bold">Collections by method</h2>
+          <span className="text-xs" style={{ color: "var(--color-text-secondary)" }}>of {rupees(cbm.total)} received</span>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-3">
+          {cbm.methods.map((m) => (
+            <div key={m.key}>
+              <div className="flex items-center justify-between gap-2">
+                <span className="flex items-center gap-1.5 text-sm font-semibold">
+                  <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: methodColor[m.key] }} aria-hidden />
+                  {m.label}
+                </span>
+                <span className="text-xs font-semibold" style={{ color: "var(--color-text-secondary)" }}>{m.pct}%</span>
+              </div>
+              <div className="mt-1 text-lg font-bold tabular-nums">{rupees(m.amount)}</div>
+              <div className="mt-1.5 h-1.5 w-full rounded-full" style={{ background: "var(--color-muted-bg)" }}>
+                <div className="bar-grow h-1.5 rounded-full" style={{ width: `${m.pct}%`, background: methodColor[m.key] }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </Card>
 
       <Card className="overflow-x-auto !p-0">
         <table>

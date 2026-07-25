@@ -69,6 +69,29 @@ export function feeAnalytics(db: DB) {
   return { agreed, received, pending, collectionRate: rate, casesWithBalance };
 }
 
+export type MethodSlice = { key: string; label: string; amount: number; pct: number };
+/** Split the money actually received by how it was collected (cash / bank /
+ *  gateway). Any received fee with an unrecognised/missing method counts as cash
+ *  (the app's default), so the parts always sum back to total received. */
+export function collectionsByMethod(db: DB): { total: number; methods: MethodSlice[] } {
+  const received = db.fees.filter((f) => f.kind === "received");
+  const total = received.reduce((s, f) => s + f.amount, 0);
+  const sums: Record<string, number> = { cash: 0, bank: 0, gateway: 0 };
+  for (const f of received) {
+    const m = f.method && sums[f.method] !== undefined ? f.method : "cash";
+    sums[m] += f.amount;
+  }
+  const defs = [
+    { key: "cash", label: "Cash" },
+    { key: "bank", label: "Bank transfer" },
+    { key: "gateway", label: "Online / gateway" },
+  ];
+  return {
+    total,
+    methods: defs.map((d) => ({ ...d, amount: sums[d.key], pct: total > 0 ? Math.round((sums[d.key] / total) * 100) : 0 })),
+  };
+}
+
 // ---- Limitation deadlines (Limitation Act 1908 — common periods) ---------
 
 type DeadlineRule = { label: string; days: number; from: "decided" | "filed" };

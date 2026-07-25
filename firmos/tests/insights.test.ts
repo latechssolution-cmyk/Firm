@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { buildSeed } from "../src/lib/db/seed";
 import {
   attentionItems, findConflicts, suggestNextStage, caseDeadlines, feeAnalytics, caseBalance, isStale,
+  collectionsByMethod,
 } from "../src/lib/insights";
 
 const db = buildSeed();
@@ -64,6 +65,17 @@ test("fee analytics computes a sane collection rate", () => {
 
 test("Malik's balance is Rs 40,000", () => {
   assert.equal(caseBalance(db, "k-malik").balance, 40000);
+});
+
+test("collections-by-method reconciles to total received (seed: bank 1.01M, cash 100k)", () => {
+  const cbm = collectionsByMethod(db);
+  const sum = cbm.methods.reduce((s, m) => s + m.amount, 0);
+  assert.equal(sum, cbm.total, "method parts must sum to total received");
+  assert.equal(cbm.total, feeAnalytics(db).received, "total must equal received");
+  const byKey = Object.fromEntries(cbm.methods.map((m) => [m.key, m.amount]));
+  assert.equal(byKey.bank, 1010000);
+  assert.equal(byKey.cash, 100000);
+  assert.equal(byKey.gateway, 0);
 });
 
 test("isStale ignores cases with upcoming hearings", () => {
